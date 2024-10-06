@@ -1,0 +1,39 @@
+/*!
+ * Pusher JavaScript Library v8.4.0-rc2
+ * https://pusher.com/
+ *
+ * Copyright 2020, Pusher
+ * Released under the MIT licence.
+ */
+
+/*! #__NO_SIDE_EFFECTS__ */
+
+/**
+* @vue/compiler-core v3.5.8
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/reactivity v3.5.8
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-core v3.5.8
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-dom v3.5.8
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/shared v3.5.8
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
