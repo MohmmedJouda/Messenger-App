@@ -6,15 +6,13 @@
 
         <!-- Chat: Form -->
         <form method="POST" action="/api/messages" @submit.prevent="sendMessage()"
-        class="chat-form rounded-pill bg-dark"
-            data-emoji-form="">
+            class="chat-form rounded-pill bg-dark" data-emoji-form="">
             <input type="hidden" name="_token" :value="$root.csrfToken">
-            <input type="hidden" name="conversation_id"
-            :value="conversation? conversation.id : 0">
+            <input type="hidden" name="conversation_id" :value="conversation? conversation.id : 0">
             <div class="row align-items-center gx-0">
                 <div class="col-auto">
-                    <a href="#" @click.prevent="selectFile()"
-                    class="btn btn-icon btn-link text-body rounded-circle" id="dz-btn">
+                    <a href="#" @click.prevent="selectFile()" class="btn btn-icon btn-link text-body rounded-circle"
+                        id="dz-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="feather feather-paperclip">
@@ -27,23 +25,14 @@
 
 
                 <div class="col">
-                    <div class="input-group" >
-                        <textarea name="message" v-model="message"
-                        @focus="$root.markAsRead()"
-                        @keypress="startTyping()"
-                        class="form-control px-0" id="inputMessage" placeholder="Type your message..." rows="1"
-                            data-emoji-input="" data-autosize="true" style="overflow: hidden; overflow-wrap: break-word; resize: none; height: 47.2px;"></textarea>
+                    <div class="input-group">
+                        <textarea name="message" v-model="message" @focus="$root.markAsRead()" @keypress="startTyping()"
+                            class="form-control px-0 txt1" id="inputMessage" placeholder="Type your message..." rows="1"
+                            data-emoji-input="" data-autosize="true"
+                            style="overflow: hidden; overflow-wrap: break-word; resize: none; height: 47.2px;"></textarea>
 
-                            <a href="#" class="input-group-text text-body pe-0" data-emoji-btn="">
-                            <span class="icon icon-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smile">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                                <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                            </svg>
-                            </span>
-                        </a>
+                        <button type="button" id="btn2" class="input-group-text text-body pe-0 fa-solid fa-face-smile fa-lg">
+                        </button>
                     </div>
                 </div>
 
@@ -102,34 +91,46 @@ export default {
             },1000);
         },
         sendMessage(){
-            let data = {
-                conversation_id: this.$root.conversation.id,
-                message: this.message,
-                _token: this.$root.csrfToken
-            };
-            let formData = new FormData();
-            formData.append('conversation_id',this.$root.conversation.id);
-            formData.append('message',this.message);
-            formData.append('_token',this.$root.csrfToken);
-            formData.append('attachment',this.attachment);
-            if(this.attachment){
-                formData.append('attachment',this.attachment);
+            // check if value of message is empty or not.
+
+            let emoji = document.getElementById('inputMessage').value;
+            if (this.message == "" && emoji == "") {
+                console.log("empty");
+                // alert('Please Enter The Message..')
+            }else{
+                // add emoji to input
+                this.message = emoji;
+                // send the message
+
+                let data = {
+                    conversation_id: this.$root.conversation.id,
+                    message: this.message,
+                    _token: this.$root.csrfToken
+                };
+                let formData = new FormData();
+                formData.append('conversation_id', this.$root.conversation.id);
+                formData.append('message', this.message);
+                formData.append('_token', this.$root.csrfToken);
+                formData.append('attachment', this.attachment);
+                if (this.attachment) {
+                    formData.append('attachment', this.attachment);
+                }
+                fetch('/api/messages', {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                    },
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(json => {
+                        this.$root.messages.push(json);
+                        var container = document.getElementById("chat-body");
+                        container.scrollIntoView();
+                    });
+                this.message = "";
+                this.attachment = null;
             }
-            fetch('/api/messages',{
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(json => {
-                this.$root.messages.push(json);
-                var container = document.getElementById("chat-body");
-                container.scrollIntoView();
-            });
-            this.message = "";
-            this.attachment = null;
         },
         selectFile(){
             let fileElm = document.createElement('input');

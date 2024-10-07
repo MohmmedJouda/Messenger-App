@@ -19978,34 +19978,46 @@ __webpack_require__.r(__webpack_exports__);
     },
     sendMessage: function sendMessage() {
       var _this2 = this;
-      var data = {
-        conversation_id: this.$root.conversation.id,
-        message: this.message,
-        _token: this.$root.csrfToken
-      };
-      var formData = new FormData();
-      formData.append('conversation_id', this.$root.conversation.id);
-      formData.append('message', this.message);
-      formData.append('_token', this.$root.csrfToken);
-      formData.append('attachment', this.attachment);
-      if (this.attachment) {
+      // check if value of message is empty or not.
+
+      var emoji = document.getElementById('inputMessage').value;
+      if (this.message == "" && emoji == "") {
+        console.log("empty");
+        // alert('Please Enter The Message..')
+      } else {
+        // add emoji to input
+        this.message = emoji;
+        // send the message
+
+        var data = {
+          conversation_id: this.$root.conversation.id,
+          message: this.message,
+          _token: this.$root.csrfToken
+        };
+        var formData = new FormData();
+        formData.append('conversation_id', this.$root.conversation.id);
+        formData.append('message', this.message);
+        formData.append('_token', this.$root.csrfToken);
         formData.append('attachment', this.attachment);
+        if (this.attachment) {
+          formData.append('attachment', this.attachment);
+        }
+        fetch('/api/messages', {
+          method: "POST",
+          headers: {
+            "Accept": "application/json"
+          },
+          body: formData
+        }).then(function (response) {
+          return response.json();
+        }).then(function (json) {
+          _this2.$root.messages.push(json);
+          var container = document.getElementById("chat-body");
+          container.scrollIntoView();
+        });
+        this.message = "";
+        this.attachment = null;
       }
-      fetch('/api/messages', {
-        method: "POST",
-        headers: {
-          "Accept": "application/json"
-        },
-        body: formData
-      }).then(function (response) {
-        return response.json();
-      }).then(function (json) {
-        _this2.$root.messages.push(json);
-        var container = document.getElementById("chat-body");
-        container.scrollIntoView();
-      });
-      this.message = "";
-      this.attachment = null;
     },
     selectFile: function selectFile() {
       var _this3 = this;
@@ -20523,7 +20535,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeypress: _cache[3] || (_cache[3] = function ($event) {
       return $options.startTyping();
     }),
-    "class": "form-control px-0",
+    "class": "form-control px-0 txt1",
     id: "inputMessage",
     placeholder: "Type your message...",
     rows: "1",
@@ -20535,7 +20547,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "resize": "none",
       "height": "47.2px"
     }
-  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.message]]), _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<a href=\"#\" class=\"input-group-text text-body pe-0\" data-emoji-btn=\"\"><span class=\"icon icon-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-smile\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M8 14s1.5 2 4 2 4-2 4-2\"></path><line x1=\"9\" y1=\"9\" x2=\"9.01\" y2=\"9\"></line><line x1=\"15\" y1=\"9\" x2=\"15.01\" y2=\"9\"></line></svg></span></a>", 1))])]), _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-auto\"><button class=\"btn btn-icon btn-primary rounded-circle ms-5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-send\"><line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"></line><polygon points=\"22 2 15 22 11 13 2 9 22 2\"></polygon></svg></button></div>", 1))])], 32 /* NEED_HYDRATION */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Chat: Form ")]);
+  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.message]]), _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    id: "btn2",
+    "class": "input-group-text text-body pe-0 fa-solid fa-face-smile fa-lg"
+  }, null, -1 /* HOISTED */))])]), _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-auto\"><button class=\"btn btn-icon btn-primary rounded-circle ms-5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-send\"><line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"></line><polygon points=\"22 2 15 22 11 13 2 9 22 2\"></polygon></svg></button></div>", 1))])], 32 /* NEED_HYDRATION */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Chat: Form ")]);
 }
 
 /***/ }),

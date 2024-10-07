@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/template.bundle.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/template.dark.bundle.css') }}"
         media="(prefers-color-scheme: dark)" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
 </head>
 
 <body>
@@ -3732,9 +3734,6 @@
                 </div>
             </div>
         </div>
-        {{-- @foreach ($friends as $friend)
-        <p>{{$friend->name}}</p>
-        @endforeach --}}
     </div>
 
     <!-- Scripts -->
@@ -3742,6 +3741,8 @@
     <script src="{{ asset('assets/js/template.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.js') }}"></script>
     <script src="{{ asset('assets/js/moment.js') }}"></script>
+    <script src="{{ asset('assets/js/Emoji.js') }}"></script>
+    <script src="{{ asset('assets/js/Emoji.min.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script>
@@ -3750,6 +3751,42 @@
         const token = "{{ Auth::user()->remember_token }}";
         const friends = @json($friends);
 
+    </script>
+
+    {{-- Emoji --}}
+    <script>
+        new EmojiPicker({
+            trigger: [
+                {
+                    selector: '.btn1',
+                    insertInto: ['.txt0', '.txt1'] //If there is only one '.selector', than it can be used without array
+                },
+                {
+                    selector: '#btn2',
+                    insertInto: '.txt1'
+                }
+            ],
+            closeButton: true,
+            dragButton: true,
+            width: 350,
+            height: 370,
+            addPosX: -130,
+            addPosY: -380,
+            tabbed: false,
+            navPos: "bottom",
+            navButtonReversed: false,
+            disableSearch: false,
+            hiddenScrollBar: true, // Not for Firefox
+            animation: "slideDown",
+            animationDuration: "1s",
+            disableNav: false,
+            emojiDim: {
+                emojiPerRow: 5,
+                emojiSize: 30,
+                emojiButtonHeight: 80,
+                hideCategory: true
+            },
+        });
     </script>
     <script src="{{ asset('js/messages.js') }}"></script>
 
