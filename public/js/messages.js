@@ -19900,34 +19900,51 @@ __webpack_require__.r(__webpack_exports__);
   props: ["conversation"],
   data: function data() {
     return {
+      // نستخدم 0 كقيمة افتراضية لتمييزها عن null
       fetched: 0
     };
   },
-  mounted: function mounted() {
-    var _this = this;
-    if (this.conversation && this.fetched != this.conversation.id) {
-      fetch("/api/conversations/".concat(this.conversation.id, "/messages")).then(function (response) {
-        return response.json();
-      }).then(function (json) {
-        _this.$root.messages = json.messages.data.reverse();
-        _this.fetched = _this.conversation.id;
+  methods: {
+    fetchMessages: function fetchMessages() {
+      var _this = this;
+      // 1. تحقق من وجود محادثة ولها ID حقيقي (ليس null وليس 0)
+      if (this.conversation && this.conversation.id && this.fetched != this.conversation.id) {
+        fetch("/api/conversations/".concat(this.conversation.id, "/messages")).then(function (response) {
+          return response.json();
+        }).then(function (json) {
+          // تأكد أن json.messages موجود قبل عمل reverse
+          _this.$root.messages = json.messages ? json.messages.data.reverse() : [];
+          _this.fetched = _this.conversation.id;
+          _this.scrollToBottom();
+        })["catch"](function (err) {
+          console.error("Failed to fetch messages:", err);
+          _this.$root.messages = [];
+        });
+      }
+      // 2. إذا كانت المحادثة جديدة (ID = null أو 0)
+      else if (this.conversation && !this.conversation.id && this.fetched !== 'new_chat') {
+        this.$root.messages = []; // تصفير الشاشة فوراً
+        this.fetched = 'new_chat'; // علامة لمنع التكرار اللانهائي في updated
+      }
+    },
+    scrollToBottom: function scrollToBottom() {
+      // نستخدم setTimeout لضمان أن العناصر تم رسمها في الـ DOM قبل عمل الـ Scroll
+      setTimeout(function () {
         var container = document.getElementById("chat-body");
-        container.scrollIntoView();
-      });
+        if (container) {
+          container.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      }, 50);
     }
   },
+  mounted: function mounted() {
+    this.fetchMessages();
+  },
   updated: function updated() {
-    var _this2 = this;
-    if (this.conversation && this.fetched != this.conversation.id) {
-      fetch("/api/conversations/".concat(this.conversation.id, "/messages")).then(function (response) {
-        return response.json();
-      }).then(function (json) {
-        _this2.$root.messages = json.messages.data.reverse();
-        _this2.fetched = _this2.conversation.id;
-        var container = document.getElementById("chat-body");
-        container.scrollIntoView();
-      });
-    }
+    this.fetchMessages();
   }
 });
 
@@ -20167,8 +20184,33 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     this.fetchUser();
   },
   methods: {
-    fetchFriends: function fetchFriends() {
+    openConversation: function openConversation(friend) {
+      // 1. البحث في المحادثات الموجودة حالياً في الـ Root (التي تم جلبها في ChatList)
+      var existingConversation = this.$root.conversations.find(function (conv) {
+        return conv.participants.some(function (p) {
+          return p.id === friend.id;
+        });
+      });
+      if (existingConversation) {
+        // إذا كانت المحادثة موجودة، نفتحها مباشرة
+        this.$root.conversation = existingConversation;
+      } else {
+        // إذا لم تكن موجودة، نحتاج لإنشاء كائن محادثة "مؤقت" أو وهمي
+        // ليقوم الـ ChatContent بمحاولة جلب الرسائل أو إرسال أول رسالة
+        this.$root.conversation = {
+          id: null,
+          // ID غير موجود بعد
+          participants: [friend],
+          new_messages: 0,
+          last_message: null
+        };
+      }
 
+      // إغلاق أي قائمة منسدلة أو الانتقال لتبويب المحادثات (إذا كنت تستخدم Tabs)
+      // إذا كنت تستخدم نظام الـ Bootstrap Modals أو Offcanvas لإظهار القائمة
+      // تأكد من تفعيل عرض المكون Messenger
+    },
+    fetchFriends: function fetchFriends() {
       // fetch('/api/friends', {
       //     method: 'GET',
       //     headers: {
@@ -20805,12 +20847,13 @@ var _hoisted_13 = {
 var _hoisted_14 = {
   "class": "dropdown-menu"
 };
+var _hoisted_15 = ["onClick"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Title "), _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Title "), _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "mb-8"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
     "class": "fw-bold m-0"
-  }, "Friends")], -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Search "), _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"mb-6\"><form action=\"#\"><div class=\"input-group\"><div class=\"input-group-text\"><div class=\"icon icon-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-search\"><circle cx=\"11\" cy=\"11\" r=\"8\"></circle><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></line></svg></div></div><input type=\"text\" class=\"form-control form-control-lg ps-0\" placeholder=\"Search messages or users\" aria-label=\"Search for messages or users...\"></div></form><!-- Invite button --><div class=\"mt-5\"><a href=\"#\" class=\"btn btn-lg btn-primary w-100 d-flex align-items-center\" data-bs-toggle=\"modal\" data-bs-target=\"#modal-invite\"> Find Friends <span class=\"icon ms-auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-user-plus\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><line x1=\"20\" y1=\"8\" x2=\"20\" y2=\"14\"></line><line x1=\"23\" y1=\"11\" x2=\"17\" y2=\"11\"></line></svg></span></a></div></div>", 1)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(this.$root.users.data, function (friend) {
+  }, "Friends")], -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Search "), _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"mb-6\"><form action=\"#\"><div class=\"input-group\"><div class=\"input-group-text\"><div class=\"icon icon-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-search\"><circle cx=\"11\" cy=\"11\" r=\"8\"></circle><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"></line></svg></div></div><input type=\"text\" class=\"form-control form-control-lg ps-0\" placeholder=\"Search messages or users\" aria-label=\"Search for messages or users...\"></div></form><!-- Invite button --><div class=\"mt-5\"><a href=\"#\" class=\"btn btn-lg btn-primary w-100 d-flex align-items-center\" data-bs-toggle=\"modal\" data-bs-target=\"#modal-invite\"> Find Friends <span class=\"icon ms-auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-user-plus\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"></path><circle cx=\"8.5\" cy=\"7\" r=\"4\"></circle><line x1=\"20\" y1=\"8\" x2=\"20\" y2=\"14\"></line><line x1=\"23\" y1=\"11\" x2=\"17\" y2=\"11\"></line></svg></span></a></div></div>", 1)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(this.$root.users.data, function (friend) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: friend.id,
       "class": "card-list mb-6"
@@ -20818,7 +20861,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "avatar-img",
       src: friend.avatar_url,
       alt: ""
-    }, null, 8 /* PROPS */, _hoisted_7)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(friend.name), 1 /* TEXT */)]), friend.last_login != null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$root.moment(friend.last_login).fromNow()), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), friend.last_login == null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_11, "Last seen a long time ago")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    }, null, 8 /* PROPS */, _hoisted_7)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(friend.name), 1 /* TEXT */)]), friend.last_login != null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$root.moment(friend.last_login).fromNow()), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), friend.last_login == null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_11, "Last seen a long time ago")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
       "class": "icon text-muted",
       href: "#",
       role: "button",
@@ -20848,17 +20891,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       cy: "19",
       r: "1"
     })])], -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      onClick: _cache[0] || (_cache[0] = function ($event) {
-        return _ctx.setConversation(_ctx.conversation);
-      }),
+      onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+        return $options.openConversation(friend);
+      }, ["prevent"]),
       "class": "dropdown-item",
       href: "#"
-    }, "New message")]), _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    }, " New message ", 8 /* PROPS */, _hoisted_15)]), _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
       "class": "dropdown-item",
       href: "#"
-    }, "Edit contact")], -1 /* HOISTED */)), _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("hr", {
+    }, "Edit contact")], -1 /* HOISTED */)), _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("hr", {
       "class": "dropdown-divider"
-    })], -1 /* HOISTED */)), _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    })], -1 /* HOISTED */)), _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
       "class": "dropdown-item text-danger",
       href: "#"
     }, "Block user")], -1 /* HOISTED */))])])])])])])]);
@@ -20925,6 +20968,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var laravel_echo__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! laravel-echo */ "./node_modules/laravel-echo/dist/echo.js");
 /* harmony import */ var pusher_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 /* harmony import */ var pusher_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pusher_js__WEBPACK_IMPORTED_MODULE_5__);
+/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
@@ -20964,12 +21008,12 @@ var chatApp = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createApp)({
     // console.log(process.env.MIX_PUSHER_APP_KEY);
     this.laravelEcho = new laravel_echo__WEBPACK_IMPORTED_MODULE_4__["default"]({
       broadcaster: "pusher",
-      key: "2d8c5e4623ffbd468514",
-      cluster: (_process$env$MIX_PUSH = "ap2") !== null && _process$env$MIX_PUSH !== void 0 ? _process$env$MIX_PUSH : "mt1",
-      wsHost: (_process$env$MIX_PUSH2 = "") !== null && _process$env$MIX_PUSH2 !== void 0 ? _process$env$MIX_PUSH2 : "ws-".concat("ap2", ".pusher.com"),
-      wsPort: (_process$env$MIX_PUSH3 = "443") !== null && _process$env$MIX_PUSH3 !== void 0 ? _process$env$MIX_PUSH3 : 80,
-      wssPort: (_process$env$MIX_PUSH4 = "443") !== null && _process$env$MIX_PUSH4 !== void 0 ? _process$env$MIX_PUSH4 : 443,
-      forceTLS: ((_process$env$MIX_PUSH5 = "https") !== null && _process$env$MIX_PUSH5 !== void 0 ? _process$env$MIX_PUSH5 : "https") === "https",
+      key: process.env.MIX_PUSHER_APP_KEY,
+      cluster: (_process$env$MIX_PUSH = process.env.MIX_PUSHER_APP_CLUSTER) !== null && _process$env$MIX_PUSH !== void 0 ? _process$env$MIX_PUSH : "mt1",
+      wsHost: (_process$env$MIX_PUSH2 = process.env.MIX_PUSHER_HOST) !== null && _process$env$MIX_PUSH2 !== void 0 ? _process$env$MIX_PUSH2 : "ws-".concat(process.env.MIX_PUSHER_APP_CLUSTER, ".pusher.com"),
+      wsPort: (_process$env$MIX_PUSH3 = process.env.MIX_PUSHER_PORT) !== null && _process$env$MIX_PUSH3 !== void 0 ? _process$env$MIX_PUSH3 : 80,
+      wssPort: (_process$env$MIX_PUSH4 = process.env.MIX_PUSHER_PORT) !== null && _process$env$MIX_PUSH4 !== void 0 ? _process$env$MIX_PUSH4 : 443,
+      forceTLS: ((_process$env$MIX_PUSH5 = process.env.MIX_PUSHER_SCHEME) !== null && _process$env$MIX_PUSH5 !== void 0 ? _process$env$MIX_PUSH5 : "https") === "https",
       enabledTransports: ["ws", "wss"]
     });
     this.laravelEcho.join("Messenger.".concat(this.userId)).listen(".new-message", function (data) {

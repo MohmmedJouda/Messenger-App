@@ -96,8 +96,9 @@
 
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a @click="setConversation(conversation)" class="dropdown-item" href="#">New
-                                        message</a>
+                                    <a @click.prevent="openConversation(friend)" class="dropdown-item" href="#">
+                                        New message
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="#">Edit
@@ -141,8 +142,33 @@ export default {
         this.fetchUser();
     },
     methods:{
-        fetchFriends(){
+            openConversation(friend) {
+            // 1. البحث في المحادثات الموجودة حالياً في الـ Root (التي تم جلبها في ChatList)
+            let existingConversation = this.$root.conversations.find(conv => {
+                return conv.participants.some(p => p.id === friend.id);
+            });
 
+            if (existingConversation) {
+                // إذا كانت المحادثة موجودة، نفتحها مباشرة
+                this.$root.conversation = existingConversation;
+            } else {
+                // إذا لم تكن موجودة، نحتاج لإنشاء كائن محادثة "مؤقت" أو وهمي
+                // ليقوم الـ ChatContent بمحاولة جلب الرسائل أو إرسال أول رسالة
+                this.$root.conversation = {
+                    id: null, // ID غير موجود بعد
+                    participants: [friend],
+                    new_messages: 0,
+                    last_message: null
+                };
+            }
+
+            // إغلاق أي قائمة منسدلة أو الانتقال لتبويب المحادثات (إذا كنت تستخدم Tabs)
+            // إذا كنت تستخدم نظام الـ Bootstrap Modals أو Offcanvas لإظهار القائمة
+            // تأكد من تفعيل عرض المكون Messenger
+        },
+
+
+        fetchFriends(){
         // fetch('/api/friends', {
         //     method: 'GET',
         //     headers: {

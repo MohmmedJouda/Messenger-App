@@ -96,45 +96,54 @@
     </div>
 </template>
 <script>
-
 export default {
-    props:[
+    props: [
         "conversation"
     ],
     data() {
         return {
+            // نستخدم 0 كقيمة افتراضية لتمييزها عن null
             fetched: 0,
         }
     },
-    mounted(){
-        if(this.conversation && this.fetched != this.conversation.id){
-            fetch(`/api/conversations/${this.conversation.id}/messages`)
-            .then(response => response.json())
-            .then(json => {
-                this.$root.messages = json.messages.data.reverse();
-                this.fetched = this.conversation.id;
-
-                var container = document.getElementById("chat-body");
-                container.scrollIntoView();
-
-            })
+    methods: {
+        fetchMessages() {
+            // 1. تحقق من وجود محادثة ولها ID حقيقي (ليس null وليس 0)
+            if (this.conversation && this.conversation.id && this.fetched != this.conversation.id) {
+                fetch(`/api/conversations/${this.conversation.id}/messages`)
+                    .then(response => response.json())
+                    .then(json => {
+                        // تأكد أن json.messages موجود قبل عمل reverse
+                        this.$root.messages = json.messages ? json.messages.data.reverse() : [];
+                        this.fetched = this.conversation.id;
+                        this.scrollToBottom();
+                    })
+                    .catch(err => {
+                        console.error("Failed to fetch messages:", err);
+                        this.$root.messages = [];
+                    });
+            }
+            // 2. إذا كانت المحادثة جديدة (ID = null أو 0)
+            else if (this.conversation && !this.conversation.id && this.fetched !== 'new_chat') {
+                this.$root.messages = []; // تصفير الشاشة فوراً
+                this.fetched = 'new_chat'; // علامة لمنع التكرار اللانهائي في updated
+            }
+        },
+        scrollToBottom() {
+            // نستخدم setTimeout لضمان أن العناصر تم رسمها في الـ DOM قبل عمل الـ Scroll
+            setTimeout(() => {
+                const container = document.getElementById("chat-body");
+                if (container) {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 50);
         }
     },
-    updated(){
-        if(this.conversation && this.fetched != this.conversation.id){
-            fetch(`/api/conversations/${this.conversation.id}/messages`)
-            .then(response => response.json())
-            .then(json => {
-                this.$root.messages = json.messages.data.reverse();
-                this.fetched = this.conversation.id;
-
-                var container = document.getElementById("chat-body");
-                container.scrollIntoView();
-
-
-            })
-        }
+    mounted() {
+        this.fetchMessages();
+    },
+    updated() {
+        this.fetchMessages();
     }
-
 }
 </script>
