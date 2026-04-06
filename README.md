@@ -53,3 +53,27 @@ A comprehensive real-time messaging platform built with **Laravel 11** and **Vue
    ```bash
    git clone [https://github.com/MohmmedJouda/Messenger-App.git](https://github.com/MohmmedJouda/Messenger-App.git)
    cd Messenger-App
+
+## 🚀 Installation & Setup
+
+### 1. Install Dependencies
+```bash
+composer install
+npm install
+
+# Create your .env file
+cp .env.example .env
+
+# Generate the app encryption key
+php artisan key:generate
+
+# Run the migrations to create the necessary tables
+php artisan migrate
+
+# Compile assets with Vite
+npm run dev
+
+# Start Laravel server
+php artisan serve
+
+## 📸 Screenshots
