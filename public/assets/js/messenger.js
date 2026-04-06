@@ -72,7 +72,7 @@ const addMessage = function (msg, c = "") {
 };
 
 const getConversations = function () {
-    $.get("/api/conversations", function (response) {
+    $.get("/conversations", function (response) {
         for (i in response.data) {
             conversation(response.data[i]);
         }
@@ -117,7 +117,7 @@ $("#chat-list").on("click", "[data-messages]", function (e) {
     let id = $(this).attr("data-messages");
     $("#chat-body").empty();
     $("input[name=conversation_id]").val(id);
-    $.get(`/api/conversations/${id}/messages`, function (response) {
+    $.get(`conversations/${id}/messages`, function (response) {
         $("#chat-name").text(response.conversation.participants[0].name);
         $("#chat-avatar").attr(
             "src",

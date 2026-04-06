@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import Messenger from "./components/messages/Messenger.vue";
 import ChatList from "./components/messages/ChatList.vue";
 import Friends from "./components/messages/Friends.vue";
+import CreateChat from "./components/messages/CreateChat.vue";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 window.Pusher = Pusher;
@@ -18,19 +19,20 @@ const chatApp = createApp({
             users: [],
             chatChannel: null,
             alertAudio: new Audio("/assets/audio/new-message.wav"),
+            soundEnabled: true,
             token: token,
             users: friends,
         };
     },
     mounted() {
         this.alertAudio.addEventListener("ended", () => {
-            this.alertAudio.current_time = 0;
+            this.alertAudio.currentTime = 0;
         });
         // console.log(process.env.MIX_PUSHER_APP_KEY);
         this.laravelEcho = new Echo({
             broadcaster: "pusher",
             key: process.env.MIX_PUSHER_APP_KEY,
-            cluster: process.env.MIX_PUSHER_APP_CLUSTER ?? "mt1",
+            cluster: process.env.MIX_PUSHER_APP_CLUSTER ?? "ap2",
             wsHost:
                 process.env.MIX_PUSHER_HOST ??
                 `ws-${process.env.MIX_PUSHER_APP_CLUSTER}.pusher.com`,
@@ -67,20 +69,24 @@ const chatApp = createApp({
                         break;
                     }
                     if (!exists) {
-                        fetch(
-                            `/api/conversation/${data.message.conversation_id}`
-                        )
-                            .then((response) => data.json())
+                        fetch(`/conversation/${data.message.conversation_id}`)
+                            .then((response) => response.json())
                             .then((json) => {
                                 this.conversations.push(json);
                             });
                     }
                 }
 
-                this.alertAudio.play();
+                this.playAudio();
             });
         this.chatChannel = this.laravelEcho
             .join("Chat")
+            .here((users) => {
+                // 'users' هي مصفوفة بكل الأشخاص المتصلين الآن لحظة دخولك أنت
+                users.forEach((user) => {
+                    this.updateUserStatus(user.id, true);
+                });
+            })
             .joining((user) => {
                 for (let i in this.conversations) {
                     let conversation = this.conversations[i];
@@ -89,6 +95,7 @@ const chatApp = createApp({
                         return;
                     }
                 }
+                this.updateUserStatus(user.id, true);
             })
             .leaving((user) => {
                 for (let i in this.conversations) {
@@ -98,8 +105,10 @@ const chatApp = createApp({
                         return;
                     }
                 }
+                this.updateUserStatus(user.id, false);
             })
             .listenForWhisper("typing", (e) => {
+                console.log("استقبال حدث كتابة:", e); // للتأكد في الـ Console
                 let user = this.findUser(e.id, e.conversation_id);
                 if (user) {
                     user.isTyping = true;
@@ -116,13 +125,20 @@ const chatApp = createApp({
         moment(time) {
             return moment(time);
         },
-        isOnline(user) {
-            for (let i in this.users) {
-                if (this.users[i].id == user.id) {
-                    return this.users[i].isOnline;
+        updateUserStatus(userId, status) {
+            this.conversations.forEach((conversation) => {
+                // نبحث عن المشارك الذي ليس "أنا" (صاحب الحساب الحالي)
+                let participant = conversation.participants.find(p => p.id == userId);
+                if (participant) {
+                    participant.isOnline = status;
                 }
-            }
-            return false;
+            });
+        },
+        isOnline(user) {
+            if (!user) return false;
+            let usersArray = Array.isArray(this.users) ? this.users : (this.users?.data || []);
+            let found = usersArray.find(u => u && u.id == user.id);
+            return found ? found.isOnline : false;
         },
         findUser(id, conversation_id) {
             for (let i in this.conversations) {
@@ -139,7 +155,7 @@ const chatApp = createApp({
             if (conversation == null) {
                 conversation = this.conversation;
             }
-            fetch(`/api/conversations/${conversation.id}/read`, {
+            fetch(`/conversations/${conversation.id}/read`, {
                 method: "PUT",
                 mode: "cors",
                 headers: {
@@ -156,7 +172,7 @@ const chatApp = createApp({
                 });
         },
         deleteMessage(message) {
-            fetch(`/api/messages/${message.id}`, {
+            fetch(`/messages/${message.id}`, {
                 method: "DELETE",
                 mode: "cors",
                 headers: {
@@ -177,9 +193,17 @@ const chatApp = createApp({
         getAllUsers(friends) {
             console.log(friends);
         },
+        playAudio() {
+            if (this.soundEnabled) {
+                this.alertAudio.pause();
+                this.alertAudio.currentTime = 0;
+                this.alertAudio.play().catch(e => console.log("Audio play failed:", e));
+            }
+        },
     },
 });
 chatApp.component("Messenger", Messenger);
 chatApp.component("ChatList", ChatList);
 chatApp.component("Friends", Friends);
+chatApp.component("CreateChat", CreateChat);
 chatApp.mount("#chat-app");

@@ -62,41 +62,38 @@ class MessagesController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
         $request->validate([
-            // 'message' => [Rule::requiredIf(function () use ($request) {
-            //     return !$request->hasFile('attachment');
-            // }), 'string'],
-            // 'attachment' => ['file'],
+            'message' => [
+                Rule::requiredIf(!$request->hasFile('attachment')),
+                'nullable',
+                'string' // أضفنا nullable لأن الرسالة قد تكون مرفقاً فقط
+            ],
             'conversation_id' => [
-                Rule::requiredIf(function () use ($request) {
-                    return !$request->input('user_id');
-                }),
+                'required',
                 'int',
-                'exists:conversations,id',
+                // نتحقق من الوجود فقط إذا لم يكن 0
+                $request->input('conversation_id') != 0 ? 'exists:conversations,id' : '',
             ],
             'user_id' => [
-                Rule::requiredIf(function () use ($request) {
-                    return !$request->input('conversation_id');
-                }),
+                Rule::requiredIf($request->input('conversation_id') == 0),
+                'nullable',
                 'int',
                 'exists:users,id',
             ],
         ]);
 
         $user = Auth::user();
-        // $user = User::find(1);
-
         $conversation_id = $request->post('conversation_id');
         $user_id = $request->post('user_id');
 
         DB::beginTransaction();
         try {
-            if ($conversation_id) {
+            // نتحقق من ID حقيقي أكبر من 0
+            if ($conversation_id > 0) {
                 $conversation = $user->conversations()->findOrFail($conversation_id);
             } else {
-
-                $conversation = Conversation::where('type', '=', 'peer')
+                // البحث عن محادثة peer موجودة مسبقاً بين الطرفين
+                $conversation = Conversation::where('type', 'peer')
                     ->whereHas('participants', function ($builder) use ($user_id, $user) {
                         $builder->join('participants as participants2', 'participants2.conversation_id', '=', 'participants.conversation_id')
                             ->where('participants.user_id', '=', $user_id)
@@ -117,16 +114,15 @@ class MessagesController extends Controller
             }
 
             $type = 'text';
-            $message = $request->post('message');
+            $body = $request->post('message'); // غيرنا الاسم لـ body لتجنب تداخل الأسماء
+
             if ($request->hasFile('attachment')) {
                 $file = $request->file('attachment');
-                $message = [
+                $body = [ // هنا نخزن تفاصيل الملف
                     'file_name' => $file->getClientOriginalName(),
                     'file_size' => $file->getSize(),
                     'mimetype' => $file->getMimeType(),
-                    'file_path' => $file->store('attachments', [
-                        'disk' => 'public'
-                    ]),
+                    'file_path' => $file->store('attachments', ['disk' => 'public']),
                 ];
                 $type = 'attachment';
             }
@@ -134,16 +130,18 @@ class MessagesController extends Controller
             $message = $conversation->messages()->create([
                 'user_id' => $user->id,
                 'type' => $type,
-                'body' => $message,
+                'body' => $body, // سيقوم لارافل بعمل Cast لـ array إلى JSON تلقائياً إذا أعددت ذلك في الموديل
             ]);
 
+            // إضافة المستلمين (Recipient)
             DB::statement('
-                INSERT INTO recipients (user_id, message_id)
-                SELECT user_id, ? FROM participants
-                WHERE conversation_id = ?
-                AND user_id <> ?
-            ', [$message->id, $conversation->id, $user->id]);
+            INSERT INTO recipients (user_id, message_id)
+            SELECT user_id, ? FROM participants
+            WHERE conversation_id = ?
+            AND user_id <> ?
+        ', [$message->id, $conversation->id, $user->id]);
 
+            // تحديث آخر رسالة وتاريخ التحديث لترتيب المحادثات
             $conversation->update([
                 'last_message_id' => $message->id,
             ]);
@@ -152,14 +150,14 @@ class MessagesController extends Controller
 
             $message->load('user');
 
+            // بث الحدث عبر Pusher
             broadcast(new MessageCreated($message));
-        } catch (Throwable $e) {
-            DB::rollBack();
 
+            return $message;
+        } catch (\Throwable $e) {
+            DB::rollBack();
             throw $e;
         }
-
-        return $message;
     }
 
     /**

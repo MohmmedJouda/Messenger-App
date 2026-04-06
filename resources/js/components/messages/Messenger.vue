@@ -25,7 +25,7 @@
                 <!-- Chat: Footer -->
                 <ChatFooter :conversation= "conversation"/>
                 <!-- Chat: Footer -->
-                 
+
             </div>
         </div>
 
@@ -36,10 +36,12 @@
 import ChatHeader from './ChatHeader.vue';
 import ChatContent from './ChatContent.vue';
 import ChatFooter from './ChatFooter.vue';
+import ChatList from './ChatList.vue';  
+import CreateChat from './CreateChat.vue';
 
 export default {
     components:{
-        ChatHeader, ChatContent, ChatFooter
+        ChatHeader, ChatContent, ChatFooter, ChatList, CreateChat
     },
     props: [
         "conversation"

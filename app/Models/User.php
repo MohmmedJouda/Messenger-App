@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'screen_lock',
         'last_login',
+        'two_factor_secret',
     ];
 
     /**
@@ -75,6 +76,14 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         // return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=' . $this->name;
-        return 'https://ui-avatars.com/api/?background=random&name=' . $this->name;
+        if ($this->profile && $this->profile->photo) {
+            return asset('storage/' . $this->profile->photo);
+        }
+        return 'https://ui-avatars.com/api/?background=random&name=' . urlencode($this->name);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class, 'user_id', 'id')->withDefault();
     }
 }

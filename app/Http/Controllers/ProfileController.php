@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -24,7 +25,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
         $request->user()->fill($request->validated());
 
@@ -34,7 +35,51 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        $profileData = $request->only(['phone', 'bio', 'facebook', 'instagram', 'linkedin']);
+        if (count(array_filter($profileData, function($value) { return $value !== null || isset($value); })) > 0 || $request->hasAny(['phone', 'bio', 'facebook', 'instagram', 'linkedin'])) {
+            $request->user()->profile()->updateOrCreate(
+                ['user_id' => $request->user()->id],
+                $profileData
+            );
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Profile updated successfully']);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Upload the user's profile photo.
+     */
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+
+        // Delete old photo if it exists
+        $profile = $user->profile;
+        if ($profile && $profile->photo) {
+            Storage::disk('public')->delete($profile->photo);
+        }
+
+        // Store new photo
+        $path = $request->file('photo')->store('profile-photos', 'public');
+
+        // Update or create profile record
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            ['photo' => $path]
+        );
+
+        return response()->json([
+            'message' => 'Profile photo updated successfully',
+            'photo_url' => asset('storage/' . $path),
+        ]);
     }
 
     /**

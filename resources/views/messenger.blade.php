@@ -17,7 +17,7 @@
 
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/template.bundle.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/css/template.dark.bundle.css') }}"
+    <link id="dark-mode-stylesheet" rel="stylesheet" href="{{ asset('assets/css/template.dark.bundle.css') }}"
         media="(prefers-color-scheme: dark)" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
@@ -105,7 +105,7 @@
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                 </svg>
                                 <div class="badge badge-circle bg-primary">
-                                    <span>4</span>
+                                    <span>{{Auth::user()->conversations->count()}}</span>
                                 </div>
                             </div>
                         </a>
@@ -127,21 +127,7 @@
                     </li>
 
                     <!-- Support -->
-                    <li class="nav-item d-none d-xl-block flex-xl-grow-1">
-                        <a class="nav-link py-0 py-lg-8" id="tab-support" href="#tab-content-support"
-                            title="Support" data-bs-toggle="tab" role="tab">
-                            <div class="icon icon-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2">
-                                    </rect>
-                                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                                    <line x1="9" y1="21" x2="9" y2="9"></line>
-                                </svg>
-                            </div>
-                        </a>
-                    </li>
+
 
                     <!-- Settings -->
                     <li class="nav-item d-none d-xl-block">
@@ -165,10 +151,10 @@
                         <a href="#" class="nav-link p-0 mt-lg-2" data-bs-toggle="modal"
                             data-bs-target="#modal-profile">
                             <div class="avatar avatar-online mx-auto d-none d-xl-block">
-                                <img class="avatar-img" src="assets/img/avatars/1.jpg" alt="" />
+                                <img class="avatar-img" src="{{ Auth::user()->avatar_url }}" alt="" />
                             </div>
                             <div class="avatar avatar-online avatar-xs d-xl-none">
-                                <img class="avatar-img" src="assets/img/avatars/1.jpg" alt="" />
+                                <img class="avatar-img" src="{{ Auth::user()->avatar_url }}" alt="" />
                             </div>
                         </a>
                     </li>
@@ -183,497 +169,7 @@
                     <!-- Create -->
                     <div class="tab-pane fade h-100" id="tab-content-create-chat" role="tabpanel">
                         <div class="d-flex flex-column h-100">
-                            <div class="hide-scrollbar">
-                                <div class="container py-8">
-                                    <!-- Title -->
-                                    <div class="mb-8">
-                                        <h2 class="fw-bold m-0">Create chat</h2>
-                                    </div>
-
-                                    <!-- Search -->
-                                    <div class="mb-6">
-                                        <div class="mb-5">
-                                            <form action="#">
-                                                <div class="input-group">
-                                                    <div class="input-group-text">
-                                                        <div class="icon icon-lg">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-search">
-                                                                <circle cx="11" cy="11" r="8"></circle>
-                                                                <line x1="21" y1="21" x2="16.65"
-                                                                    y2="16.65"></line>
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-
-                                                    <input type="text" class="form-control form-control-lg ps-0"
-                                                        placeholder="Search messages or users"
-                                                        aria-label="Search for messages or users..." />
-                                                </div>
-                                            </form>
-                                        </div>
-
-                                        <ul class="nav nav-pills nav-justified" role="tablist">
-                                            <li class="nav-item">
-                                                <a class="nav-link active" data-bs-toggle="pill"
-                                                    href="#create-chat-info" role="tab"
-                                                    aria-controls="create-chat-info" aria-selected="true">
-                                                    Details
-                                                </a>
-                                            </li>
-
-                                            <li class="nav-item">
-                                                <a class="nav-link" data-bs-toggle="pill" href="#create-chat-members"
-                                                    role="tab" aria-controls="create-chat-members"
-                                                    aria-selected="true">
-                                                    People
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <!-- Tabs content -->
-                                    <div class="tab-content" role="tablist">
-                                        <div class="tab-pane fade show active" id="create-chat-info" role="tabpanel">
-                                            <div class="card border-0">
-                                                <div class="profile">
-                                                    <div class="profile-img text-primary rounded-top">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                                            viewBox="0 0 400 140.74">
-                                                            <defs>
-                                                                <style>
-                                                                    .cls-2 {
-                                                                        fill: #fff;
-                                                                        opacity: 0.1;
-                                                                    }
-                                                                </style>
-                                                            </defs>
-                                                            <g>
-                                                                <g>
-                                                                    <path
-                                                                        d="M400,125A1278.49,1278.49,0,0,1,0,125V0H400Z" />
-                                                                    <path class="cls-2"
-                                                                        d="M361.13,128c.07.83.15,1.65.27,2.46h0Q380.73,128,400,125V87l-1,0a38,38,0,0,0-38,38c0,.86,0,1.71.09,2.55C361.11,127.72,361.12,127.88,361.13,128Z" />
-                                                                    <path class="cls-2"
-                                                                        d="M12.14,119.53c.07.79.15,1.57.26,2.34v0c.13.84.28,1.66.46,2.48l.07.3c.18.8.39,1.59.62,2.37h0q33.09,4.88,66.36,8,.58-1,1.09-2l.09-.18a36.35,36.35,0,0,0,1.81-4.24l.08-.24q.33-.94.6-1.9l.12-.41a36.26,36.26,0,0,0,.91-4.42c0-.19,0-.37.07-.56q.11-.86.18-1.73c0-.21,0-.42,0-.63,0-.75.08-1.51.08-2.28a36.5,36.5,0,0,0-73,0c0,.83,0,1.64.09,2.45C12.1,119.15,12.12,119.34,12.14,119.53Z" />
-                                                                    <circle class="cls-2" cx="94.5"
-                                                                        cy="57.5" r="22.5" />
-                                                                    <path class="cls-2"
-                                                                        d="M276,0a43,43,0,0,0,43,43A43,43,0,0,0,362,0Z" />
-                                                                </g>
-                                                            </g>
-                                                        </svg>
-                                                    </div>
-
-                                                    <div class="profile-body p-0">
-                                                        <div class="avatar avatar-lg">
-                                                            <span class="avatar-text bg-primary">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="feather feather-image">
-                                                                    <rect x="3" y="3" width="18" height="18"
-                                                                        rx="2" ry="2"></rect>
-                                                                    <circle cx="8.5" cy="8.5" r="1.5">
-                                                                    </circle>
-                                                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                                                </svg>
-                                                            </span>
-
-                                                            <div
-                                                                class="badge badge-lg badge-circle bg-primary border-outline position-absolute bottom-0 end-0">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="feather feather-plus">
-                                                                    <line x1="12" y1="5"
-                                                                        x2="12" y2="19"></line>
-                                                                    <line x1="5" y1="12"
-                                                                        x2="19" y2="12"></line>
-                                                                </svg>
-                                                            </div>
-
-                                                            <input id="upload-chat-img" class="d-none"
-                                                                type="file" />
-                                                            <label class="stretched-label mb-0"
-                                                                for="upload-chat-img"></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="card-body">
-                                                    <form autocomplete="off">
-                                                        <div class="row gy-6">
-                                                            <div class="col-12">
-                                                                <div class="form-floating">
-                                                                    <input type="text" class="form-control"
-                                                                        id="floatingInput"
-                                                                        placeholder="Enter a chat name" />
-                                                                    <label for="floatingInput">Enter group name</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="form-floating">
-                                                                    <textarea class="form-control" placeholder="Description" id="floatingTextarea" rows="8" data-autosize="true"
-                                                                        style="min-height: 100px"></textarea>
-                                                                    <label for="floatingTextarea">What's your
-                                                                        purpose?</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex align-items-center mt-4 px-6">
-                                                <small class="text-muted me-auto">Enter chat name and add an optional
-                                                    photo.</small>
-                                            </div>
-
-                                            <!-- Options -->
-                                            <div class="mt-8">
-                                                <div class="d-flex align-items-center mb-4 px-6">
-                                                    <small class="text-muted me-auto">Options</small>
-                                                </div>
-
-                                                <div class="card border-0">
-                                                    <div class="card-body">
-                                                        <div class="row gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="btn btn-sm btn-icon btn-dark">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                                        width="24" height="24"
-                                                                        viewBox="0 0 24 24" fill="none"
-                                                                        stroke="currentColor" stroke-width="2"
-                                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                                        class="feather feather-lock">
-                                                                        <rect x="3" y="11" width="18"
-                                                                            height="11" rx="2"
-                                                                            ry="2"></rect>
-                                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Make Private</h5>
-                                                                <p>Can only be viewed by invites</p>
-                                                            </div>
-                                                            <div class="col-auto align-self-center">
-                                                                <div class="form-check form-switch ps-0">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        id="new-chat-options-1" />
-                                                                    <label class="form-check-label"
-                                                                        for="new-chat-options-1"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Members -->
-                                        <div class="tab-pane fade" id="create-chat-members" role="tabpanel">
-                                            <nav>
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">B</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/6.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Bill Marrow</h5>
-                                                                <p>last seen 3 days ago</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-1" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-1"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-1"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">D</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/5.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Damian Binder</h5>
-                                                                <p>last seen within a week</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-2" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-2"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-2"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card --><!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar avatar-online">
-                                                                    <span class="avatar-text">D</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Don Knight</h5>
-                                                                <p>online</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-3" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-3"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-3"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">E</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar avatar-online">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/8.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Elise Dennis</h5>
-                                                                <p>online</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-4" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-4"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-4"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">M</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar">
-                                                                    <span class="avatar-text">M</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Marshall Wallaker</h5>
-                                                                <p>last seen within a month</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-6" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-6"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-6"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card --><!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/11.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Mila White</h5>
-                                                                <p>last seen a long time ago</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-5" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-5"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-5"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">O</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar avatar-online">
-                                                                    <span class="avatar-text">O</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Ollie Chandler</h5>
-                                                                <p>online</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-7" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-7"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-7"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-
-                                                <div class="my-5">
-                                                    <small class="text-uppercase text-muted">W</small>
-                                                </div>
-
-                                                <!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/4.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>Warren White</h5>
-                                                                <p>last seen recently</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-8" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-8"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-8"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card --><!-- Card -->
-                                                <div class="card border-0 mt-5">
-                                                    <div class="card-body">
-                                                        <div class="row align-items-center gx-5">
-                                                            <div class="col-auto">
-                                                                <div class="avatar avatar-online">
-                                                                    <img class="avatar-img"
-                                                                        src="assets/img/avatars/7.jpg"
-                                                                        alt="" />
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <h5>William Wright</h5>
-                                                                <p>online</p>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="" id="id-member-9" />
-                                                                    <label class="form-check-label"
-                                                                        for="id-member-9"></label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <label class="stretched-label" for="id-member-9"></label>
-                                                    </div>
-                                                </div>
-                                                <!-- Card -->
-                                            </nav>
-                                        </div>
-                                    </div>
-                                    <!-- Tabs content -->
-                                </div>
-                            </div>
-
-                            <!-- Button -->
-                            <div class="container mt-n4 mb-8 position-relative">
-                                <button class="btn btn-lg btn-primary w-100 d-flex align-items-center" type="button">
-                                    Start chat
-                                    <span class="icon ms-auto">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="feather feather-chevron-right">
-                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </div>
-                            <!-- Button -->
+                            <create-chat />
                         </div>
                     </div>
 
@@ -1272,243 +768,7 @@
                     </div>
 
                     <!-- Support -->
-                    <div class="tab-pane fade h-100" id="tab-content-support" role="tabpanel">
-                        <div class="d-flex flex-column h-100">
-                            <div class="hide-scrollbar">
-                                <div class="container py-8">
-                                    <!-- Title -->
-                                    <div class="mb-8">
-                                        <h2 class="fw-bold m-0">Support</h2>
-                                    </div>
 
-                                    <!-- Search -->
-                                    <div class="mb-6">
-                                        <form action="#">
-                                            <div class="input-group">
-                                                <div class="input-group-text">
-                                                    <div class="icon icon-lg">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                            height="24" viewBox="0 0 24 24" fill="none"
-                                                            stroke="currentColor" stroke-width="2"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            class="feather feather-search">
-                                                            <circle cx="11" cy="11" r="8"></circle>
-                                                            <line x1="21" y1="21" x2="16.65"
-                                                                y2="16.65"></line>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-
-                                                <input type="text" class="form-control form-control-lg ps-0"
-                                                    placeholder="Search messages or users"
-                                                    aria-label="Search for messages or users..." />
-                                            </div>
-                                        </form>
-                                    </div>
-
-                                    <!-- Docs -->
-                                    <div class="card border-0">
-                                        <div class="card-body">
-                                            <div class="row align-items-center gx-5">
-                                                <div class="col-auto text-primary">
-                                                    <svg version="1.1" width="46px" height="46px"
-                                                        fill="currentColor" xmlns="http://www.w3.org/2000/svg"
-                                                        xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                                        viewBox="0 0 46 46" enable-background="new 0 0 46 46"
-                                                        xml:space="preserve">
-                                                        <polygon opacity="0.7" points="45,11 36,11 35.5,1 " />
-                                                        <polygon points="35.5,1 25.4,14.1 39,21 " />
-                                                        <polygon opacity="0.4" points="17,9.8 39,21 17,26 " />
-                                                        <polygon opacity="0.7" points="2,12 17,26 17,9.8 " />
-                                                        <polygon opacity="0.7" points="17,26 39,21 28,36 " />
-                                                        <polygon points="28,36 4.5,44 17,26 " />
-                                                        <polygon points="17,26 1,26 10.8,20.1 " />
-                                                    </svg>
-                                                </div>
-
-                                                <div class="col">
-                                                    <h4 class="mb-1">Documentation</h4>
-                                                    <p>Setup and build tools</p>
-                                                </div>
-
-                                                <div class="col-auto">
-                                                    <a href="docs/index.html"
-                                                        class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                            height="24" viewBox="0 0 24 24" fill="none"
-                                                            stroke="currentColor" stroke-width="2"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            class="feather feather-chevron-right">
-                                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                                        </svg>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Docs -->
-
-                                    <!-- Demos -->
-                                    <div class="card-list mt-8">
-                                        <div class="d-flex align-items-center mb-4 px-6">
-                                            <small class="text-muted me-auto">Demos</small>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <img src="assets/img/demos/light.jpg" class="card-img-top"
-                                                alt="..." />
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Light</h4>
-                                                        <p>Classic light theme</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="./light/"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <img src="assets/img/demos/dark.jpg" class="card-img-top"
-                                                alt="..." />
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Dark</h4>
-                                                        <p>Classic dark theme</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="./dark/"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Demos -->
-
-                                    <!-- Account Pages -->
-                                    <div class="card-list mt-8">
-                                        <div class="d-flex align-items-center mb-4 px-6">
-                                            <small class="text-muted me-auto">Pages</small>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Sign In</h4>
-                                                        <p>Sign in Page</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="signin.html"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Sign Up</h4>
-                                                        <p>Sign Up Page</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="signup.html"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Password Reset</h4>
-                                                        <p>Password Reset Page</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="password-reset.html"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card border-0">
-                                            <div class="card-body">
-                                                <div class="row align-items-center gx-0">
-                                                    <div class="col">
-                                                        <h4 class="mb-1">Lock screen</h4>
-                                                        <p>Lock screen Page</p>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <a href="lockscreen.html"
-                                                            class="btn btn-sm btn-icon btn-primary rounded-circle">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                class="feather feather-chevron-right">
-                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Account Pages -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Settings -->
                     <div class="tab-pane fade h-100" id="tab-content-settings" role="tabpanel">
@@ -1539,8 +799,8 @@
                                                 </div>
 
                                                 <input type="text" class="form-control form-control-lg ps-0"
-                                                    placeholder="Search messages or users"
-                                                    aria-label="Search for messages or users..." />
+                                                    placeholder="Search settings"
+                                                    aria-label="Search for settings..." />
                                             </div>
                                         </form>
                                     </div>
@@ -1550,50 +810,56 @@
                                         <div class="card-body">
                                             <div class="row align-items-center gx-5">
                                                 <div class="col-auto">
-                                                    <div class="avatar">
-                                                        <img src="assets/img/avatars/1.jpg" alt="#"
-                                                            class="avatar-img" />
+                                                    <div class="avatar position-relative" id="settings-avatar-wrapper" style="cursor:pointer;" title="Click to change photo">
+                                                        <img id="settings-avatar-preview"
+                                                            src="{{ Auth::user()->profile->photo ? asset('storage/' . Auth::user()->profile->photo) : Auth::user()->avatar_url }}"
+                                                            alt="#" class="avatar-img" />
 
-                                                        <div
-                                                            class="badge badge-circle bg-secondary border-outline position-absolute bottom-0 end-0">
+                                                        <!-- Camera overlay badge -->
+                                                        <div class="badge badge-circle bg-secondary border-outline position-absolute bottom-0 end-0">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                 height="24" viewBox="0 0 24 24" fill="none"
                                                                 stroke="currentColor" stroke-width="2"
                                                                 stroke-linecap="round" stroke-linejoin="round"
                                                                 class="feather feather-image">
-                                                                <rect x="3" y="3" width="18" height="18"
-                                                                    rx="2" ry="2"></rect>
-                                                                <circle cx="8.5" cy="8.5" r="1.5">
-                                                                </circle>
+                                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                                                 <polyline points="21 15 16 10 5 21"></polyline>
                                                             </svg>
                                                         </div>
-                                                        <input id="upload-profile-photo" class="d-none"
-                                                            type="file" />
-                                                        <label class="stretched-label mb-0"
-                                                            for="upload-profile-photo"></label>
+
+                                                        <!-- Hidden file input -->
+                                                        <input id="upload-profile-photo" class="d-none" type="file" accept="image/*" />
+                                                        <!-- Clickable label over entire avatar -->
+                                                        <label class="stretched-label mb-0" for="upload-profile-photo"></label>
                                                     </div>
+
+                                                    <!-- Update button — hidden until a photo is chosen -->
+                                                    <button id="btn-upload-photo" class="btn btn-sm btn-primary w-100 mt-2 d-none"
+                                                        data-upload-url="{{ route('profile.photo') }}">
+                                                        Upload
+                                                    </button>
                                                 </div>
                                                 <div class="col">
-                                                    <h5>William Pearson</h5>
-                                                    <p>wright@studio.com</p>
+                                                    <h5>{{ auth()->user()->name }}</h5>
+                                                    <p>{{ auth()->user()->email }}</p>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <a href="#" class="text-muted">
+                                                    <a href="{{ route('logout') }}" class="text-muted"
+                                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                         <div class="icon">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                 height="24" viewBox="0 0 24 24" fill="none"
                                                                 stroke="currentColor" stroke-width="2"
                                                                 stroke-linecap="round" stroke-linejoin="round"
                                                                 class="feather feather-log-out">
-                                                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4">
-                                                                </path>
+                                                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                                                 <polyline points="16 17 21 12 16 7"></polyline>
-                                                                <line x1="21" y1="12" x2="9"
-                                                                    y2="12"></line>
+                                                                <line x1="21" y1="12" x2="9" y2="12"></line>
                                                             </svg>
                                                         </div>
                                                     </a>
+                                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </div>
                                             </div>
                                         </div>
@@ -1630,35 +896,35 @@
                                                             aria-labelledby="accordion-profile-1"
                                                             data-parent="#accordion-profile">
                                                             <div class="accordion-body">
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="text" class="form-control"
-                                                                        id="profile-name" placeholder="Name" />
-                                                                    <label for="profile-name">Name</label>
-                                                                </div>
+                                                                <form id="form-profile-settings" class="ajax-form" action="{{ route('profile.update') }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="text" class="form-control" name="name" id="profile-name" value="{{ Auth::user()->name }}" placeholder="Name" required />
+                                                                        <label for="profile-name">Name</label>
+                                                                    </div>
 
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="email" class="form-control"
-                                                                        id="profile-email"
-                                                                        placeholder="Email address" />
-                                                                    <label for="profile-email">Email</label>
-                                                                </div>
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="email" class="form-control" name="email" id="profile-email" value="{{ Auth::user()->email }}" placeholder="Email address" required />
+                                                                        <label for="profile-email">Email</label>
+                                                                    </div>
 
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="text" class="form-control"
-                                                                        id="profile-phone" placeholder="Phone" />
-                                                                    <label for="profile-phone">Phone</label>
-                                                                </div>
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="text" class="form-control" name="phone" id="profile-phone" value="{{ Auth::user()->profile->phone_number ?? '' }}" placeholder="Phone" />
+                                                                        <label for="profile-phone">Phone</label>
+                                                                    </div>
 
-                                                                <div class="form-floating mb-6">
-                                                                    <textarea class="form-control" placeholder="Bio" id="profile-bio" data-autosize="true"
-                                                                        style="min-height: 120px"></textarea>
-                                                                    <label for="profile-bio">Bio</label>
-                                                                </div>
+                                                                    <div class="form-floating mb-6">
+                                                                        <textarea class="form-control" name="bio" placeholder="Bio" id="profile-bio" data-autosize="true"
+                                                                            style="min-height: 120px">{{ Auth::user()->profile->bio ?? '' }}</textarea>
+                                                                        <label for="profile-bio">Bio</label>
+                                                                    </div>
 
-                                                                <button type="button"
-                                                                    class="btn btn-block btn-lg btn-primary w-100">
-                                                                    Save
-                                                                </button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-block btn-lg btn-primary w-100">
+                                                                        Save
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1683,31 +949,29 @@
                                                             aria-labelledby="accordion-profile-2"
                                                             data-parent="#accordion-profile">
                                                             <div class="accordion-body">
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="text" class="form-control"
-                                                                        id="profile-twitter"
-                                                                        placeholder="Twitter" />
-                                                                    <label for="profile-twitter">Twitter</label>
-                                                                </div>
+                                                                <form id="form-connected-accounts" class="ajax-form" action="{{ route('profile.update') }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="text" class="form-control" name="linkedin" id="profile-linkedin" value="{{ Auth::user()->profile->linkedin ?? '' }}" placeholder="LinkedIn" />
+                                                                        <label for="profile-linkedin">LinkedIn</label>
+                                                                    </div>
 
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="text" class="form-control"
-                                                                        id="profile-facebook"
-                                                                        placeholder="Facebook" />
-                                                                    <label for="profile-facebook">Facebook</label>
-                                                                </div>
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="text" class="form-control" name="facebook" id="profile-facebook" value="{{ Auth::user()->profile->facebook ?? '' }}" placeholder="Facebook" />
+                                                                        <label for="profile-facebook">Facebook</label>
+                                                                    </div>
 
-                                                                <div class="form-floating mb-6">
-                                                                    <input type="text" class="form-control"
-                                                                        id="profile-instagram"
-                                                                        placeholder="Instagram" />
-                                                                    <label for="profile-instagram">Instagram</label>
-                                                                </div>
+                                                                    <div class="form-floating mb-6">
+                                                                        <input type="text" class="form-control" name="instagram" id="profile-instagram" value="{{ Auth::user()->profile->instagram ?? '' }}" placeholder="Instagram" />
+                                                                        <label for="profile-instagram">Instagram</label>
+                                                                    </div>
 
-                                                                <button type="button"
-                                                                    class="btn btn-block btn-lg btn-primary w-100">
-                                                                    Save
-                                                                </button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-block btn-lg btn-primary w-100">
+                                                                        Save
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1747,38 +1011,25 @@
                                                             aria-labelledby="accordion-security-1"
                                                             data-parent="#accordion-security">
                                                             <div class="accordion-body">
-                                                                <form action="#" autocomplete="on">
+                                                                <form id="form-security-password" class="ajax-form" action="{{ route('password.update') }}" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
                                                                     <div class="form-floating mb-6">
-                                                                        <input type="password" class="form-control"
-                                                                            id="profile-current-password"
-                                                                            placeholder="Current Password"
-                                                                            autocomplete="" />
-                                                                        <label for="profile-current-password">Current
-                                                                            Password</label>
+                                                                        <input type="password" name="current_password" class="form-control" id="profile-current-password" placeholder="Current Password" autocomplete="current-password" />
+                                                                        <label for="profile-current-password">Current Password</label>
                                                                     </div>
 
                                                                     <div class="form-floating mb-6">
-                                                                        <input type="password" class="form-control"
-                                                                            id="profile-new-password"
-                                                                            placeholder="New password"
-                                                                            autocomplete="" />
-                                                                        <label for="profile-new-password">New
-                                                                            password</label>
+                                                                        <input type="password" name="password" class="form-control" id="profile-new-password" placeholder="New password" autocomplete="new-password" />
+                                                                        <label for="profile-new-password">New password</label>
                                                                     </div>
 
                                                                     <div class="form-floating mb-6">
-                                                                        <input type="password" class="form-control"
-                                                                            id="profile-verify-password"
-                                                                            placeholder="Verify Password"
-                                                                            autocomplete="" />
-                                                                        <label for="profile-verify-password">Verify
-                                                                            Password</label>
+                                                                        <input type="password" name="password_confirmation" class="form-control" id="profile-verify-password" placeholder="Verify Password" autocomplete="new-password" />
+                                                                        <label for="profile-verify-password">Verify Password</label>
                                                                     </div>
+                                                                    <button type="submit" class="btn btn-block btn-lg btn-primary w-100">Save</button>
                                                                 </form>
-                                                                <button type="button"
-                                                                    class="btn btn-block btn-lg btn-primary w-100">
-                                                                    Save
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1795,7 +1046,11 @@
                                                                     <div class="form-check form-switch">
                                                                         <input class="form-check-input"
                                                                             type="checkbox"
-                                                                            id="accordion-security-check-1" />
+                                                                            id="accordion-security-check-1"
+                                                                            data-enable-url="{{ route('2fa.enable') }}"
+                                                                            data-confirm-url="{{ route('2fa.confirm') }}"
+                                                                            data-disable-url="{{ route('2fa.disable') }}"
+                                                                            {{ Auth::user()->two_factor_secret ? 'checked' : '' }} />
                                                                         <label class="form-check-label"
                                                                             for="accordion-security-check-1"></label>
                                                                     </div>
@@ -1808,6 +1063,61 @@
                                         </div>
                                     </div>
                                     <!-- Security -->
+
+                                    <!-- Theme -->
+                                    <div class="mt-8">
+                                        <div class="d-flex align-items-center my-4 px-6">
+                                            <small class="text-muted me-auto">Theme</small>
+                                        </div>
+
+                                        <div class="card border-0">
+                                            <div class="card-body py-2">
+                                                <div class="accordion accordion-flush">
+                                                    <div class="accordion-item">
+                                                        <div class="accordion-header">
+                                                            <div class="row align-items-center">
+                                                                <div class="col">
+                                                                    <h5>Dark Mode</h5>
+                                                                    <p>Switch between light and dark theme</p>
+                                                                </div>
+                                                                <div class="col-auto">
+                                                                    <div class="d-flex gap-2">
+                                                                        <button id="btn-theme-light"
+                                                                            class="btn btn-sm btn-icon rounded-circle"
+                                                                            title="Light Mode">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                                <circle cx="12" cy="12" r="5"></circle>
+                                                                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                                                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                                                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                                                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                                                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                                                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                                                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                                                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                                                            </svg>
+                                                                        </button>
+                                                                        <button id="btn-theme-dark"
+                                                                            class="btn btn-sm btn-icon rounded-circle"
+                                                                            title="Dark Mode">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                                                            </svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Theme -->
 
                                     <!-- Storage -->
                                     <div class="mt-8">
@@ -3299,11 +2609,11 @@
 
                             <div class="profile-body">
                                 <div class="avatar avatar-xl">
-                                    <img class="avatar-img" src="./assets/img/avatars/1.jpg" alt="#" />
+                                    <img class="avatar-img" src="{{ Auth::user()->avatar_url }}" alt="#" />
                                 </div>
 
                                 <h4 class="mb-1">{{ Auth::user()->name }}</h4>
-                                <p>last seen 5 minutes ago</p>
+                                <p>{{ Auth::user()->profile->bio ?? 'No bio available.' }}</p>
                             </div>
                         </div>
                         <!-- Header -->
@@ -3316,7 +2626,7 @@
                                 <div class="row align-items-center gx-6">
                                     <div class="col">
                                         <h5>Location</h5>
-                                        <p>USA, Houston</p>
+                                        <p>{{ Auth::user()->profile->location ?? 'Not provided' }}</p>
                                     </div>
 
                                     <div class="col-auto">
@@ -3341,8 +2651,30 @@
                             <li class="list-group-item">
                                 <div class="row align-items-center gx-6">
                                     <div class="col">
+                                        <h5>Social Profiles</h5>
+                                        <div class="mt-2">
+                                            @if(Auth::user()->profile && Auth::user()->profile->facebook)
+                                            <a href="{{ Auth::user()->profile->facebook }}" target="_blank" class="btn btn-sm btn-icon btn-dark me-2"><i class="fab fa-facebook-f"></i></a>
+                                            @endif
+                                            @if(Auth::user()->profile && Auth::user()->profile->instagram)
+                                            <a href="{{ Auth::user()->profile->instagram }}" target="_blank" class="btn btn-sm btn-icon btn-dark me-2"><i class="fab fa-instagram"></i></a>
+                                            @endif
+                                            @if(Auth::user()->profile && Auth::user()->profile->linkedin)
+                                            <a href="{{ Auth::user()->profile->linkedin }}" target="_blank" class="btn btn-sm btn-icon btn-dark me-2"><i class="fab fa-linkedin-in"></i></a>
+                                            @endif
+                                            @if(!Auth::user()->profile || (!Auth::user()->profile->facebook && !Auth::user()->profile->instagram && !Auth::user()->profile->linkedin))
+                                            <p class="text-muted small">No social links provided.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <div class="row align-items-center gx-6">
+                                    <div class="col">
                                         <h5>E-mail</h5>
-                                        <p>william@studio.com</p>
+                                        <p>{{ Auth::user()->email }}</p>
                                     </div>
 
                                     <div class="col-auto">
@@ -3365,7 +2697,7 @@
                                 <div class="row align-items-center gx-6">
                                     <div class="col">
                                         <h5>Phone</h5>
-                                        <p>1-800-275-2273</p>
+                                        <p>{{ Auth::user()->profile->phone_number ?? 'Not provided' }}</p>
                                     </div>
 
                                     <div class="col-auto">
@@ -3750,14 +3082,12 @@
         const csrf_token = "{{ csrf_token() }}";
         const token = "{{ Auth::user()->remember_token }}";
         const friends = @json($friends);
-
     </script>
 
     {{-- Emoji --}}
     <script>
         new EmojiPicker({
-            trigger: [
-                {
+            trigger: [{
                     selector: '.btn1',
                     insertInto: ['.txt0', '.txt1'] //If there is only one '.selector', than it can be used without array
                 },
@@ -3807,8 +3137,288 @@
         });
     </script> --}}
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.ajax-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const url = this.getAttribute('action');
+                    const method = this.getAttribute('method') || 'POST';
 
+                    // Convert FormData to simple object to send via axios if needed, but axios handles formData fine
+                    axios({
+                        method: method,
+                        url: url,
+                        data: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf_token
+                        }
+                    }).then(response => {
+                        let msg = response.data.message || 'Updated successfully!';
+                        // Custom messages per form
+                        if (this.id === 'form-security-password') {
+                            msg = 'The password is updated';
+                            this.reset();
+                        }
 
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: msg,
+                            confirmButtonText: 'OK',
+                            timer: 3000
+                        });
+                    }).catch(error => {
+                        let msg = 'Something went wrong!';
+                        if (error.response && error.response.data && error.response.data.errors) {
+                            msg = Object.values(error.response.data.errors).flat().join('\n');
+                        } else if (error.response && error.response.data && error.response.data.message) {
+                            msg = error.response.data.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: msg,
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                });
+            });
+
+            // Two-Factor Authentication toggle
+            const twoFaToggle = document.getElementById('accordion-security-check-1');
+            if (twoFaToggle) {
+                twoFaToggle.addEventListener('change', function() {
+                        const toggle = this;
+                        if (toggle.checked) {
+                            // Enabling 2FA: request QR code then show setup popup
+                            axios.post(toggle.dataset.enableUrl, {}, {
+                                headers: {
+                                    'X-CSRF-TOKEN': csrf_token,
+                                    'Accept': 'application/json'
+                                }
+                            }).then(res => {
+                                const {
+                                    secret,
+                                    qr_code
+                                } = res.data;
+                                Swal.fire({
+                                    title: 'Set up Two-Step Verification',
+                                    html: `
+                                    <p class="mb-3 text-muted">Scan this QR code with your Authenticator app (e.g. Google Authenticator), then enter the 6-digit code below to confirm.</p>
+                                    <div class="d-flex justify-content-center mb-3">${qr_code}</div>
+                                    <p class="small text-muted mb-2">Manual entry key: <strong>${secret}</strong></p>
+                                    <input id="swal-2fa-code" type="text" class="swal2-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" />
+                                `,
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Confirm',
+                                    cancelButtonText: 'Cancel',
+                                    focusConfirm: false,
+                                    preConfirm: () => {
+                                        const code = document.getElementById('swal-2fa-code').value;
+                                        if (!code || code.length < 6) {
+                                            Swal.showValidationMessage('Please enter the 6-digit code from your authenticator app');
+                                            return false;
+                                        }
+                                        return axios.post(toggle.dataset.confirmUrl, {
+                                            code
+                                        }, {
+                                            headers: {
+                                                'X-CSRF-TOKEN': csrf_token,
+                                                'Accept': 'application/json'
+                                            }
+                                        }).then(r => r.data).catch(err => {
+                                            Swal.showValidationMessage(err.response?.data?.message || 'Invalid code. Please try again.');
+                                            return false;
+                                        });
+                                    }
+                                }).then(result => {
+                                    if (result.isConfirmed) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Enabled!',
+                                            text: 'Two-step verification has been enabled.',
+                                            timer: 2500,
+                                            showConfirmButton: false
+                                        });
+                                    } else {
+                                        // User cancelled - revert toggle
+                                        toggle.checked = false;
+                                    }
+                                });
+                            }).catch(err => {
+                                toggle.checked = false;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: err.response?.data?.message || 'Could not generate 2FA setup.'
+                                });
+                            });
+                        } else {
+                            // Disabling 2FA
+                            Swal.fire({
+                                title: 'Disable Two-Step Verification?',
+                                text: 'Are you sure you want to disable two-step verification? This will make your account less secure.',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, disable it',
+                                cancelButtonText: 'Cancel',
+                                confirmButtonColor: '#dc3545'
+                            }).then(result => {
+                                    if (result.isConfirmed) {
+                                        axios.post(toggle.dataset.disableUrl, {}, {
+                                            headers: {
+                                                'X-CSRF-TOKEN': csrf_token,
+                                                'Accept': 'application/json'
+                                            }
+                                        }).the Swal.fire({
+                                            icon: 'success',
+                                            title: 'Disabled',
+                                            text: 'Two-step verification has been disabled.',
+                                            timer: 2500,
+                                            showConfirmButton: false
+                                        });
+                                    }).catch(err => {
+                                    toggle.checked = true;
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Could not disable two-step verification.'
+                                    });
+                                });
+                            }
+                            else {
+                                // User cancelled - revert toggle back to checked
+                                toggle.checked = true;
+                            }
+                        });
+                }
+            });
+        }
+        });
+    </script>
+
+    <script>
+        // Profile photo preview & upload
+        const photoInput = document.getElementById('upload-profile-photo');
+        const photoPreview = document.getElementById('settings-avatar-preview');
+        const uploadBtn = document.getElementById('btn-upload-photo');
+
+        if (photoInput && photoPreview && uploadBtn) {
+            // Step 1: When user selects a file, preview it immediately and show Upload button
+            photoInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    uploadBtn.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Step 2: When user clicks Upload, send AJAX request
+            uploadBtn.addEventListener('click', function() {
+                const file = photoInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('photo', file);
+
+                // Show loading state
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = 'Uploading...';
+
+                axios.post(uploadBtn.dataset.uploadUrl, formData, {
+                    headers: {
+                        'X-CSRF-TOKEN': csrf_token,
+                        'Accept': 'application/json',
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then(response => {
+                    // Update the preview with the server-returned URL (confirmed stored)
+                    photoPreview.src = response.data.photo_url;
+
+                    // Also update any navbar avatar that uses the same photo
+                    const navbarAvatar = document.getElementById('navbar-avatar');
+                    if (navbarAvatar) navbarAvatar.src = response.data.photo_url;
+
+                    // Reset button and input
+                    uploadBtn.classList.add('d-none');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Upload';
+                    photoInput.value = '';
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Photo Updated!',
+                        text: 'Your profile photo has been updated successfully.',
+                        timer: 2500,
+                        showConfirmButton: false
+                    });
+                }).catch(error => {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Upload';
+
+                    let msg = 'Could not upload photo.';
+                    if (error.response && error.response.data && error.response.data.errors) {
+                        msg = Object.values(error.response.data.errors).flat().join('\n');
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Upload Failed',
+                        text: msg
+                    });
+                });
+            });
+        }
+    </script>
+
+    <script>
+        // ── Theme Toggle (Dark / Light Mode) ──────────────────────────────────
+        (function() {
+            const darkSheet = document.getElementById('dark-mode-stylesheet');
+            const btnLight = document.getElementById('btn-theme-light');
+            const btnDark = document.getElementById('btn-theme-dark');
+
+            // Apply stored preference on load
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark') {
+                darkSheet.media = 'all';
+            } else if (saved === 'light') {
+                darkSheet.media = 'none';
+            }
+            // else: follow OS preference (default media="(prefers-color-scheme: dark)")
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    darkSheet.media = 'all';
+                    localStorage.setItem('theme', 'dark');
+                    if (btnDark) btnDark.classList.add('btn-primary');
+                    if (btnLight) btnLight.classList.remove('btn-primary');
+                } else {
+                    darkSheet.media = 'none';
+                    localStorage.setItem('theme', 'light');
+                    if (btnLight) btnLight.classList.add('btn-primary');
+                    if (btnDark) btnDark.classList.remove('btn-primary');
+                }
+            }
+
+            // Highlight the currently active button on load
+            if (saved === 'dark' && btnDark) btnDark.classList.add('btn-primary');
+            if (saved === 'light' && btnLight) btnLight.classList.add('btn-primary');
+
+            if (btnLight) btnLight.addEventListener('click', () => applyTheme('light'));
+            if (btnDark) btnDark.addEventListener('click', () => applyTheme('dark'));
+        })();
+    </script>
 </body>
 
 </html>

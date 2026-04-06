@@ -21,15 +21,15 @@
                         <div class="row align-items-center gx-5">
                             <div class="col-auto">
                                 <div class="avatar d-xl-inline-block"
-                                :class = "{'avatar-online' : conversation.participants[0].isOnline}">
-                                    <img class="avatar-img" id="chat-avatar" :src="conversation.participants[0].avatar_url" alt="" />
+                                :class = "{'avatar-online' : conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isOnline}">
+                                    <img class="avatar-img" id="chat-avatar" :src="getAvatar(conversation)" alt="" />
                                 </div>
                             </div>
 
                             <div class="col overflow-hidden">
                                 <h5 class="text-truncate" id="chat-name">
-                                    {{ conversation.participants[0].name }}</h5>
-                                <p v-if="conversation.participants[0].isTyping" class="text-truncate">
+                                    {{ getName(conversation) }}</h5>
+                                <p v-if="conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isTyping" class="text-truncate">
                                     is typing<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
                                 </p>
                             </div>
@@ -58,7 +58,7 @@
                                 <div class="avatar-group">
                                     <a href="#" class="avatar avatar-sm" data-bs-toggle="modal"
                                         data-bs-target="#modal-user-profile">
-                                        <img class="avatar-img" :src="conversation.participants[0].avatar_url" alt="#" />
+                                        <img class="avatar-img" :src="getAvatar(conversation)" alt="#" />
                                     </a>
 
                                     <a href="#" class="avatar avatar-sm" data-bs-toggle="modal"
@@ -110,7 +110,7 @@ export default {
     methods:{
         async fetchUser() {
             try {
-                const response = await axios.get('/api/user');
+                const response = await axios.get('user');
                 this.userInfo = response.data;
                 console.log(this.userInfo.name);
 
@@ -118,6 +118,22 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        getAvatar(conversation) {
+            if (!conversation) return '';
+            if (conversation.type === 'group') {
+                return conversation.avatar_url ? conversation.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(conversation.label || 'Group')}&background=random`;
+            }
+            let participant = conversation.participants && conversation.participants[0] ? conversation.participants[0] : null;
+            return participant && participant.avatar_url ? participant.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(participant ? participant.name : 'User')}&background=random`;
+        },
+        getName(conversation) {
+            if (!conversation) return '';
+            if (conversation.type === 'group') {
+                return conversation.label || 'Group';
+            }
+            let participant = conversation.participants && conversation.participants[0] ? conversation.participants[0] : null;
+            return participant ? participant.name : 'Unknown';
         }
     }
 

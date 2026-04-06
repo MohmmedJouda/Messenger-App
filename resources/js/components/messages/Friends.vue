@@ -24,6 +24,7 @@
                 </div>
 
                 <input type="text" class="form-control form-control-lg ps-0"
+                    v-model="searchQuery"
                     placeholder="Search messages or users"
                     aria-label="Search for messages or users..." />
             </div>
@@ -55,7 +56,7 @@
 
     <!-- List -->
 
-    <div v-for="friend in this.$root.users.data" :key="friend.id" class="card-list mb-6">
+    <div v-for="friend in filteredFriends" :key="friend.id" class="card-list mb-6">
         <!-- Card -->
         <div class="card border-0">
             <div class="card-body">
@@ -133,6 +134,17 @@ export default {
             // friends:[],
             friends:this.$root.users.data,
             userInfo: {},
+            searchQuery: '',
+        }
+    },
+    computed: {
+        filteredFriends() {
+            let users = this.$root.users?.data || [];
+            if (!this.searchQuery) return users;
+            const query = this.searchQuery.toLowerCase();
+            return users.filter(friend => {
+                return friend.name && friend.name.toLowerCase().includes(query);
+            });
         }
     },
     mounted() {
@@ -201,7 +213,7 @@ export default {
 
         async fetchUser() {
             try {
-                const response = await axios.get('/api/user');
+                const response = await axios.get('user');
                 this.userInfo = response.data;
                 console.log(this.userInfo);
 

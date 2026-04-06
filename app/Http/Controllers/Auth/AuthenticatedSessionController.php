@@ -36,15 +36,22 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         // Attempt to log the user in
-        $user = Auth::attempt($request->only('email', 'password'));
+        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
 
-        if ($user) {
-            // Update last_login timestamp
-            $user = Auth::user(); // Get the authenticated user
-            $user->last_login = now(); // Set last_login to the current timestamp
-            $user->save(); // Save the changes
+            // If 2FA is enabled, log them out and redirect to the challenge
+            if ($user->two_factor_secret) {
+                $request->session()->put('2fa:user:id', $user->id);
+                $request->session()->put('2fa:remember', $request->boolean('remember'));
+                Auth::logout();
+                return redirect()->route('2fa.challenge');
+            }
 
-            // Redirect or return response
+            // Normal login - update last_login
+            $user->last_login = now();
+            $user->save();
+            $request->session()->regenerate();
             return redirect()->intended('/dashboard');
         }
 

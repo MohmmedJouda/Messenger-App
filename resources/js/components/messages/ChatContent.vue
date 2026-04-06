@@ -106,11 +106,25 @@ export default {
             fetched: 0,
         }
     },
+        watch: {
+        'conversation.id': function(newId, oldId) {
+            if (newId !== oldId) {
+                this.fetchMessages();
+            }
+        },
+        // راقب مصفوفة الرسائل لعمل سكرول عند وصول رسالة جديدة
+        '$root.messages': {
+            handler() {
+                this.scrollToBottom();
+            },
+            deep: true
+        }
+    },
     methods: {
         fetchMessages() {
             // 1. تحقق من وجود محادثة ولها ID حقيقي (ليس null وليس 0)
             if (this.conversation && this.conversation.id && this.fetched != this.conversation.id) {
-                fetch(`/api/conversations/${this.conversation.id}/messages`)
+                fetch(`/conversations/${this.conversation.id}/messages`)
                     .then(response => response.json())
                     .then(json => {
                         // تأكد أن json.messages موجود قبل عمل reverse
@@ -129,21 +143,33 @@ export default {
                 this.fetched = 'new_chat'; // علامة لمنع التكرار اللانهائي في updated
             }
         },
+        // scrollToBottom() {
+        //     // نستخدم setTimeout لضمان أن العناصر تم رسمها في الـ DOM قبل عمل الـ Scroll
+        //     setTimeout(() => {
+        //         const container = document.getElementById("chat-body");
+        //         if (container) {
+        //             container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        //         }
+        //     }, 50);
+        // }
         scrollToBottom() {
-            // نستخدم setTimeout لضمان أن العناصر تم رسمها في الـ DOM قبل عمل الـ Scroll
-            setTimeout(() => {
-                const container = document.getElementById("chat-body");
+            this.$nextTick(() => {
+                // نختار الحاوية التي تمتلك السكرول (الأب)
+                const container = document.getElementById("chat-content");
                 if (container) {
-                    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    container.scrollTo({
+                        top: container.scrollHeight,
+                        behavior: 'smooth'
+                    });
                 }
-            }, 50);
-        }
+         });
+}
     },
     mounted() {
         this.fetchMessages();
     },
-    updated() {
-        this.fetchMessages();
-    }
+    // updated() {
+    //     this.fetchMessages();
+    // }
 }
 </script>
