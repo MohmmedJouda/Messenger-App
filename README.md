@@ -76,4 +76,3 @@ npm run dev
 # Start Laravel server
 php artisan serve
 
-## 📸 Screenshots
