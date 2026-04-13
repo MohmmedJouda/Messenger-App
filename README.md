@@ -1,7 +1,9 @@
 <h1 align="center">🤖 AI-Powered Real-Time Communication System</h1>
-> A production-style system demonstrating real-time engineering, AI integration, and scalable backend architecture.
-> Built to demonstrate scalable real-time architecture with modern AI integration patterns.
-
+<p align="center">
+  <em>
+    A production-grade real-time system built with Laravel & Vue, integrating AI-powered communication and scalable backend design patterns.
+  </em>
+</p>
 
 <p align="center">
   <img src="https://laravel.com/img/logomark.min.svg" width="60" />
