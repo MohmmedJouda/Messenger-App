@@ -41,7 +41,7 @@
                 <div class="row gx-5">
                     <div class="col-auto">
                         <div class="avatar"
-                        :class = "{'avatar-online' : conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isOnline}">
+                        :class = "{'avatar-online' : isAI(conversation) || (conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isOnline)}">
                             <img class= "avatar-img" :src="getAvatar(conversation)">
                         </div>
                     </div>
@@ -49,8 +49,9 @@
                     <div class="col">
                         <div class="d-flex align-items-center mb-3">
                             <h5 class="me-auto mb-0">{{ getName(conversation) }}</h5>
+                            <span v-if="isAI(conversation)" class="badge bg-info-soft text-info ms-2 px-2 py-1" style="font-size: 0.6rem; letter-spacing: 0.5px;">AI</span>
                             <span class="text-muted extra-small ms-2">
-                                {{$root.moment(conversation.last_message.created_at).fromNow()}}</span>
+                                {{conversation.last_message ? $root.moment(conversation.last_message.created_at).fromNow() : ''}}</span>
                         </div>
 
                         <div class="d-flex align-items-center">
@@ -123,6 +124,9 @@ export default {
             }
             let participant = conversation.participants && conversation.participants[0] ? conversation.participants[0] : null;
             return participant ? participant.name : 'Unknown';
+        },
+        isAI(conversation) {
+            return conversation.participants && conversation.participants.some(p => p.is_ai);
         }
     },
     mounted(){

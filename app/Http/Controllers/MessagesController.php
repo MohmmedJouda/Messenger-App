@@ -62,6 +62,7 @@ class MessagesController extends Controller
      */
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info("MessagesController@store hit. Message: " . $request->post('message'));
         $request->validate([
             'message' => [
                 Rule::requiredIf(!$request->hasFile('attachment')),
@@ -150,14 +151,35 @@ class MessagesController extends Controller
 
             $message->load('user');
 
-            // بث الحدث عبر Pusher
-            broadcast(new MessageCreated($message));
+            try {
+                \Illuminate\Support\Facades\Log::info("Attempting to broadcast MessageCreated...");
+                broadcast(new MessageCreated($message));
+                \Illuminate\Support\Facades\Log::info("Broadcast successful.");
+            } catch (\Exception $broadcastError) {
+                \Illuminate\Support\Facades\Log::error("Broadcast failed: " . $broadcastError->getMessage());
+            }
+
+            \Illuminate\Support\Facades\Log::info("Checking for AI... Conv ID: " . $conversation->id);
+
+            // AI Response Logic
+            $hasAI = $conversation->participants()->where('is_ai', true)->exists();
+            \Illuminate\Support\Facades\Log::info("Has AI Participant: " . ($hasAI ? "Yes" : "No"));
+
+            if ($hasAI) {
+                \Illuminate\Support\Facades\Log::info("Dispatching ProcessAIResponse job...");
+                \App\Jobs\ProcessAIResponse::dispatch($conversation, $message);
+            }
 
             return $message;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
+    }
+
+    protected function handleAIResponse($conversation, $userMessage)
+    {
+        // Removed in favor of ProcessAIResponse job
     }
 
     /**

@@ -21,7 +21,7 @@
                         <div class="row align-items-center gx-5">
                             <div class="col-auto">
                                 <div class="avatar d-xl-inline-block"
-                                :class = "{'avatar-online' : conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isOnline}">
+                                :class = "{'avatar-online' : isAI(conversation) || (conversation.type !== 'group' && conversation.participants[0] && conversation.participants[0].isOnline)}">
                                     <img class="avatar-img" id="chat-avatar" :src="getAvatar(conversation)" alt="" />
                                 </div>
                             </div>
@@ -63,7 +63,8 @@
 
                                     <a href="#" class="avatar avatar-sm" data-bs-toggle="modal"
                                         data-bs-target="#modal-profile">
-                                        <img class="avatar-img" :src="this.userInfo.avatar_url" alt="#" />
+                                        <img v-if="userInfo.avatar_url" class="avatar-img" :src="userInfo.avatar_url" alt="#" />
+                                        <div v-else class="avatar-img avatar-text">...</div>
                                     </a>
                                 </div>
                             </div>
@@ -110,13 +111,10 @@ export default {
     methods:{
         async fetchUser() {
             try {
-                const response = await axios.get('user');
+                const response = await axios.get('current-user');
                 this.userInfo = response.data;
-                console.log(this.userInfo.name);
-
-
             } catch (error) {
-                console.error(error);
+                console.error("Failed to fetch current user:", error);
             }
         },
         getAvatar(conversation) {
@@ -134,6 +132,10 @@ export default {
             }
             let participant = conversation.participants && conversation.participants[0] ? conversation.participants[0] : null;
             return participant ? participant.name : 'Unknown';
+        },
+        isAI(conversation) {
+            if (!conversation || !conversation.participants) return false;
+            return conversation.participants.some(p => p.is_ai);
         }
     }
 

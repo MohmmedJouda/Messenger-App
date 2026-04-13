@@ -157,26 +157,32 @@ export default {
             openConversation(friend) {
             // 1. البحث في المحادثات الموجودة حالياً في الـ Root (التي تم جلبها في ChatList)
             let existingConversation = this.$root.conversations.find(conv => {
-                return conv.participants.some(p => p.id === friend.id);
+                return conv.type === 'peer' && conv.participants.some(p => p.id === friend.id);
             });
 
             if (existingConversation) {
-                // إذا كانت المحادثة موجودة، نفتحها مباشرة
+                // إذا كانت المحادثة موجودة، نفتحها ونفعلها
                 this.$root.conversation = existingConversation;
+                this.$root.markAsRead(existingConversation);
             } else {
-                // إذا لم تكن موجودة، نحتاج لإنشاء كائن محادثة "مؤقت" أو وهمي
-                // ليقوم الـ ChatContent بمحاولة جلب الرسائل أو إرسال أول رسالة
+                // إنشاء كائن محادثة "مؤقت" ببيانات كاملة للصديق لضمان ظهور الاسم والأفاتار وحالة الاتصال
                 this.$root.conversation = {
-                    id: null, // ID غير موجود بعد
-                    participants: [friend],
+                    id: null,
+                    type: 'peer',
+                    participants: [{
+                        ...friend,
+                        isOnline: this.$root.isOnline(friend)
+                    }],
                     new_messages: 0,
                     last_message: null
                 };
             }
 
-            // إغلاق أي قائمة منسدلة أو الانتقال لتبويب المحادثات (إذا كنت تستخدم Tabs)
-            // إذا كنت تستخدم نظام الـ Bootstrap Modals أو Offcanvas لإظهار القائمة
-            // تأكد من تفعيل عرض المكون Messenger
+            // الانتقال لتبويب المحادثات (Chats) لفتح الواجهة بشكل تلقائي
+            const chatTab = document.getElementById('tab-chats');
+            if (chatTab) {
+                chatTab.click();
+            }
         },
 
 

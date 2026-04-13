@@ -2609,7 +2609,7 @@
 
                             <div class="profile-body">
                                 <div class="avatar avatar-xl">
-                                    <img class="avatar-img" src="{{ Auth::user()->avatar_url }}" alt="#" />
+                                    <img class="avatar-img" src="{{ Auth::user()->profile->photo ? asset('storage/' . Auth::user()->profile->photo) : Auth::user()->avatar_url }}" alt="#" />
                                 </div>
 
                                 <h4 class="mb-1">{{ Auth::user()->name }}</h4>
@@ -3194,96 +3194,97 @@
             const twoFaToggle = document.getElementById('accordion-security-check-1');
             if (twoFaToggle) {
                 twoFaToggle.addEventListener('change', function() {
-                        const toggle = this;
-                        if (toggle.checked) {
-                            // Enabling 2FA: request QR code then show setup popup
-                            axios.post(toggle.dataset.enableUrl, {}, {
-                                headers: {
-                                    'X-CSRF-TOKEN': csrf_token,
-                                    'Accept': 'application/json'
-                                }
-                            }).then(res => {
-                                const {
-                                    secret,
-                                    qr_code
-                                } = res.data;
-                                Swal.fire({
-                                    title: 'Set up Two-Step Verification',
-                                    html: `
+                    const toggle = this;
+                    if (toggle.checked) {
+                        // Enabling 2FA: request QR code then show setup popup
+                        axios.post(toggle.dataset.enableUrl, {}, {
+                            headers: {
+                                'X-CSRF-TOKEN': csrf_token,
+                                'Accept': 'application/json'
+                            }
+                        }).then(res => {
+                            const {
+                                secret,
+                                qr_code
+                            } = res.data;
+                            Swal.fire({
+                                title: 'Set up Two-Step Verification',
+                                html: `
                                     <p class="mb-3 text-muted">Scan this QR code with your Authenticator app (e.g. Google Authenticator), then enter the 6-digit code below to confirm.</p>
                                     <div class="d-flex justify-content-center mb-3">${qr_code}</div>
                                     <p class="small text-muted mb-2">Manual entry key: <strong>${secret}</strong></p>
                                     <input id="swal-2fa-code" type="text" class="swal2-input" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" />
                                 `,
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Confirm',
-                                    cancelButtonText: 'Cancel',
-                                    focusConfirm: false,
-                                    preConfirm: () => {
-                                        const code = document.getElementById('swal-2fa-code').value;
-                                        if (!code || code.length < 6) {
-                                            Swal.showValidationMessage('Please enter the 6-digit code from your authenticator app');
-                                            return false;
-                                        }
-                                        return axios.post(toggle.dataset.confirmUrl, {
-                                            code
-                                        }, {
-                                            headers: {
-                                                'X-CSRF-TOKEN': csrf_token,
-                                                'Accept': 'application/json'
-                                            }
-                                        }).then(r => r.data).catch(err => {
-                                            Swal.showValidationMessage(err.response?.data?.message || 'Invalid code. Please try again.');
-                                            return false;
-                                        });
-                                    }
-                                }).then(result => {
-                                    if (result.isConfirmed) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Enabled!',
-                                            text: 'Two-step verification has been enabled.',
-                                            timer: 2500,
-                                            showConfirmButton: false
-                                        });
-                                    } else {
-                                        // User cancelled - revert toggle
-                                        toggle.checked = false;
-                                    }
-                                });
-                            }).catch(err => {
-                                toggle.checked = false;
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: err.response?.data?.message || 'Could not generate 2FA setup.'
-                                });
-                            });
-                        } else {
-                            // Disabling 2FA
-                            Swal.fire({
-                                title: 'Disable Two-Step Verification?',
-                                text: 'Are you sure you want to disable two-step verification? This will make your account less secure.',
-                                icon: 'warning',
                                 showCancelButton: true,
-                                confirmButtonText: 'Yes, disable it',
+                                confirmButtonText: 'Confirm',
                                 cancelButtonText: 'Cancel',
-                                confirmButtonColor: '#dc3545'
+                                focusConfirm: false,
+                                preConfirm: () => {
+                                    const code = document.getElementById('swal-2fa-code').value;
+                                    if (!code || code.length < 6) {
+                                        Swal.showValidationMessage('Please enter the 6-digit code from your authenticator app');
+                                        return false;
+                                    }
+                                    return axios.post(toggle.dataset.confirmUrl, {
+                                        code
+                                    }, {
+                                        headers: {
+                                            'X-CSRF-TOKEN': csrf_token,
+                                            'Accept': 'application/json'
+                                        }
+                                    }).then(r => r.data).catch(err => {
+                                        Swal.showValidationMessage(err.response?.data?.message || 'Invalid code. Please try again.');
+                                        return false;
+                                    });
+                                }
                             }).then(result => {
-                                    if (result.isConfirmed) {
-                                        axios.post(toggle.dataset.disableUrl, {}, {
-                                            headers: {
-                                                'X-CSRF-TOKEN': csrf_token,
-                                                'Accept': 'application/json'
-                                            }
-                                        }).the Swal.fire({
-                                            icon: 'success',
-                                            title: 'Disabled',
-                                            text: 'Two-step verification has been disabled.',
-                                            timer: 2500,
-                                            showConfirmButton: false
-                                        });
-                                    }).catch(err => {
+                                if (result.isConfirmed) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Enabled!',
+                                        text: 'Two-step verification has been enabled.',
+                                        timer: 2500,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    // User cancelled - revert toggle
+                                    toggle.checked = false;
+                                }
+                            });
+                        }).catch(err => {
+                            toggle.checked = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: err.response?.data?.message || 'Could not generate 2FA setup.'
+                            });
+                        });
+                    } else {
+                        // Disabling 2FA
+                        Swal.fire({
+                            title: 'Disable Two-Step Verification?',
+                            text: 'Are you sure you want to disable two-step verification? This will make your account less secure.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, disable it',
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#dc3545'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                axios.post(toggle.dataset.disableUrl, {}, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrf_token,
+                                        'Accept': 'application/json'
+                                    }
+                                }).then(response => {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Disabled',
+                                        text: 'Two-step verification has been disabled.',
+                                        timer: 2500,
+                                        showConfirmButton: false
+                                    });
+                                }).catch(err => {
                                     toggle.checked = true;
                                     Swal.fire({
                                         icon: 'error',
@@ -3291,15 +3292,14 @@
                                         text: 'Could not disable two-step verification.'
                                     });
                                 });
-                            }
-                            else {
+                            } else {
                                 // User cancelled - revert toggle back to checked
                                 toggle.checked = true;
                             }
                         });
-                }
-            });
-        }
+                    }
+                });
+            }
         });
     </script>
 

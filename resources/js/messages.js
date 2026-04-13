@@ -61,23 +61,38 @@ const chatApp = createApp({
                             this.conversation &&
                             this.conversation.id == conversation.id
                         ) {
-                            this.messages.push(data.message);
-                            var container =
-                                document.getElementById("chat-body");
-                            container.scrollTop = container.scrollHeight;
+                            // Deduplicate messages
+                            if (!this.messages.find(m => m.id === data.message.id)) {
+                                this.messages.push(data.message);
+                                this.$nextTick(() => {
+                                    const container = document.getElementById("chat-content");
+                                    if (container) {
+                                        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                                    }
+                                });
+                            }
                         }
                         break;
                     }
-                    if (!exists) {
-                        fetch(`/conversation/${data.message.conversation_id}`)
-                            .then((response) => response.json())
-                            .then((json) => {
-                                this.conversations.push(json);
-                            });
-                    }
+                }
+                if (!exists) {
+                    // Logic for fetching new conversation if not in list
                 }
 
                 this.playAudio();
+            })
+            .listen(".ai-typing", (data) => {
+                for (let i in this.conversations) {
+                    let conversation = this.conversations[i];
+                    if (conversation.id == data.conversationId) {
+                        let participant = conversation.participants.find(p => p.is_ai);
+                        if (participant) {
+                            participant.isOnline = true; // Always online
+                            participant.isTyping = data.isTyping;
+                        }
+                        break;
+                    }
+                }
             });
         this.chatChannel = this.laravelEcho
             .join("Chat")

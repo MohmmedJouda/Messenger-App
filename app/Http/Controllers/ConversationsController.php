@@ -13,6 +13,13 @@ class ConversationsController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        // Ensure AI communication exists
+        $aiUser = \App\Models\User::where('is_ai', true)->first();
+        if ($aiUser && $aiUser->id !== $user->id) {
+            $this->ensureAIConversation($user, $aiUser);
+        }
+
         return $user->conversations()->with([
             'lastMessage',
             'participants' => function ($builder) use ($user) {
@@ -25,7 +32,51 @@ class ConversationsController extends Controller
                         ->whereNull('read_at');
                 }
             ])
+            // Pin AI conversation to the top
+            ->orderByRaw('EXISTS (
+                SELECT 1 FROM participants p 
+                JOIN users u ON u.id = p.user_id 
+                WHERE p.conversation_id = conversations.id 
+                AND u.is_ai = 1
+            ) DESC')
+            ->orderBy('conversations.last_message_id', 'desc')
             ->paginate();
+    }
+
+    protected function ensureAIConversation($user, $aiUser)
+    {
+        $conversation = \App\Models\Conversation::where('type', 'peer')
+            ->whereHas('participants', function ($builder) use ($aiUser, $user) {
+                $builder->join('participants as p2', 'p2.conversation_id', '=', 'participants.conversation_id')
+                    ->where('participants.user_id', '=', $aiUser->id)
+                    ->where('p2.user_id', '=', $user->id);
+            })->first();
+
+        if (!$conversation) {
+            $conversation = \App\Models\Conversation::create([
+                'user_id' => $user->id,
+                'type' => 'peer',
+            ]);
+
+            $conversation->participants()->attach([
+                $user->id => ['joined_at' => now()],
+                $aiUser->id => ['joined_at' => now()],
+            ]);
+            
+            // Send welcome message from AI
+            $message = $conversation->messages()->create([
+                'user_id' => $aiUser->id,
+                'type' => 'text',
+                'body' => 'Hello! I am Messenger AI. How can I help you today?',
+            ]);
+
+            $conversation->update(['last_message_id' => $message->id]);
+            
+            \App\Models\Recipient::create([
+                'user_id' => $user->id,
+                'message_id' => $message->id,
+            ]);
+        }
     }
 
     public function show($id)

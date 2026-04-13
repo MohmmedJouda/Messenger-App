@@ -30,6 +30,6 @@ class MessengerController extends Controller
 
     public function getUser()
     {
-        return response()->json(Auth::user());
+        return response()->json(Auth::user()->load('profile'));
     }
 }

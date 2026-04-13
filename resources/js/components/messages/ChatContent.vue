@@ -107,10 +107,15 @@ export default {
         }
     },
         watch: {
-        'conversation.id': function(newId, oldId) {
-            if (newId !== oldId) {
-                this.fetchMessages();
-            }
+        conversation: {
+            handler(newConv, oldConv) {
+                // تفعيل الجلب إذا تغير الكائن نفسه أو الـ ID
+                // نستخدم JSON.stringify للمقارنة البسيطة أو نعتمد على تغيير المرجع
+                if (newConv !== oldConv || (newConv && oldConv && newConv.id !== oldConv.id)) {
+                    this.fetchMessages();
+                }
+            },
+            deep: true
         },
         // راقب مصفوفة الرسائل لعمل سكرول عند وصول رسالة جديدة
         '$root.messages': {
