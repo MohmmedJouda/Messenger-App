@@ -118,7 +118,7 @@ php artisan key:generate
 ```bash
 php artisan migrate
 ```
-##💡 Future Improvements
+###💡 Future Improvements
 * AI memory for long conversations
 * Message encryption (end-to-end)
 * Redis for scaling real-time system
